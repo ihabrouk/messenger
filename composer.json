@@ -1,5 +1,5 @@
 {
-    "name": "your-github-username/laravel-messenger",
+    "name": "ihabrouk/messenger",
     "description": "Enterprise-grade messaging package for Laravel with multi-provider support, real-time analytics, and GDPR compliance",
     "type": "library",
     "keywords": [
@@ -18,8 +18,8 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Your Name",
-            "email": "your.email@example.com"
+            "name": "Ismail El Habrouk",
+            "email": "ismailhabrouk@gmail.com"
         }
     ],
     "require": {
