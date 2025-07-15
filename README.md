@@ -160,7 +160,7 @@ use ihabrouk\Messenger\Actions\SendMessageAction;
     // Add the Send Message Action
     SendMessageAction::make()
         ->phoneField('phone')      // Map to your phone field
-        ->nameField('name')        // Map to your name field
+        ->nameField('full_name')   // Map to your name field (optional)
         ->visible(fn ($record) => !empty($record->phone))
         ->modalHeading(fn ($record) => "Send Message to {$record->name}")
         ->successNotificationTitle('Message sent successfully!')
@@ -189,7 +189,7 @@ use ihabrouk\Messenger\Actions\BulkMessageAction;
         // Add the Bulk Message Action
         BulkMessageAction::make()
             ->phoneField('phone')       // Map to your phone field
-            ->nameField('name')         // Map to your name field
+            ->nameField('full_name')    // Map to your name field (optional)
             ->maxRecipients(1000)       // Set recipient limit
             ->requiresConfirmation(true)
             ->modalHeading('Send Bulk Message Campaign')
@@ -222,9 +222,17 @@ use ihabrouk\Messenger\Actions\BulkMessageAction;
 Add a phone field to your model for messaging functionality:
 
 ```php
-// In a migration
-Schema::table('users', function (Blueprint $table) {
-    $table->string('phone', 20)->nullable()->after('email');
+// In a migration - add to any existing table
+Schema::table('your_table_name', function (Blueprint $table) {
+    $table->string('phone', 20)->nullable();
+});
+
+// Or when creating a new table
+Schema::create('contacts', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->string('phone', 20)->nullable();
+    $table->timestamps();
 });
 ```
 
@@ -234,8 +242,8 @@ Schema::table('users', function (Blueprint $table) {
 
 ```php
 SendMessageAction::make()
-    ->phoneField('mobile_number')           // Custom phone field
-    ->nameField('full_name')                // Custom name field
+    ->phoneField('phone')                   // Custom phone field
+    ->nameField('full_name')                // Custom name field (optional)
     ->label('Send SMS')                     // Custom label
     ->icon('heroicon-o-chat-bubble-left')   // Custom icon
     ->color('primary')                      // Custom color
@@ -243,8 +251,9 @@ SendMessageAction::make()
     ->requiresConfirmation(false)           // Disable confirmation
     ->successNotificationTitle('SMS Sent!') // Custom success message
     ->before(function ($action, $record) {
-        // Custom validation before sending
-        if (!$record->consent_marketing) {
+        // Example: Custom validation before sending
+        // Check if your model has a consent field
+        if (isset($record->consent_marketing) && !$record->consent_marketing) {
             $action->halt();
             Notification::make()
                 ->title('No Marketing Consent')
@@ -254,8 +263,10 @@ SendMessageAction::make()
         }
     })
     ->after(function ($action, $record, $data) {
-        // Custom logic after sending
-        $record->update(['last_message_sent' => now()]);
+        // Custom logic after sending - example assumes your model has this field
+        if (method_exists($record, 'update') && \Illuminate\Support\Facades\Schema::hasColumn($record->getTable(), 'last_message_sent')) {
+            $record->update(['last_message_sent' => now()]);
+        }
     })
 ```
 
@@ -263,8 +274,8 @@ SendMessageAction::make()
 
 ```php
 BulkMessageAction::make()
-    ->phoneField('phone_number')            // Custom phone field
-    ->nameField('display_name')             // Custom name field
+    ->phoneField('phone')                   // Custom phone field
+    ->nameField('full_name')                // Custom name field (optional)
     ->maxRecipients(100)                    // Limit recipients
     ->label('Send Campaign')                // Custom label
     ->icon('heroicon-o-megaphone')          // Custom icon
@@ -274,7 +285,7 @@ BulkMessageAction::make()
     ->before(function ($action, $records) {
         // Validate all records have required fields
         $invalidRecords = $records->filter(fn ($record) => 
-            empty($record->phone_number) || !$record->marketing_consent
+            empty($record->phone) || !$record->marketing_consent
         );
         
         if ($invalidRecords->isNotEmpty()) {
@@ -521,7 +532,22 @@ if ($hasConsent) {
 // Automatic consent checking in actions
 BulkMessageAction::make()
     ->checkConsent(true)  // Automatically filter out non-consented users
-    ->consentType('marketing');
+    ->consentType('marketing')
+    ->before(function ($action, $records) {
+        // Filter records based on consent
+        $consentedRecords = $records->filter(function ($record) {
+            return Consent::hasValidConsent($record->phone, 'marketing');
+        });
+        
+        if ($consentedRecords->isEmpty()) {
+            $action->halt();
+            Notification::make()
+                ->title('No Consented Recipients')
+                ->body('No recipients have valid marketing consent.')
+                ->warning()
+                ->send();
+        }
+    });
 ```
 
 #### Data Retention
@@ -873,7 +899,7 @@ Schema::table('messenger_messages', function (Blueprint $table) {
 });
 
 Schema::table('messenger_consents', function (Blueprint $table) {
-    $table->index(['phone_number', 'consent_type']);
+    $table->index(['phone', 'consent_type']);
     $table->index(['status', 'expires_at']);
 });
 ```
