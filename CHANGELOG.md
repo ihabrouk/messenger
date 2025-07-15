@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `laravel-messenger` will be documented in this file.
+All notable changes to `messenger` will be documented in this file.
 
 ## v1.0.0 - 2025-07-14
 

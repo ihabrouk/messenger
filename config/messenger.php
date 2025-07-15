@@ -479,7 +479,7 @@ return [
         'environments' => ['production', 'staging'],
         'tags' => [
             'component' => 'messenger',
-            'package' => 'laravel-messenger',
+            'package' => 'messenger',
         ],
         'contexts' => [
             'message_id' => true,

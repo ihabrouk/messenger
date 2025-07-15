@@ -1,9 +1,9 @@
 # Laravel Messenger
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/your-github-username/laravel-messenger.svg?style=flat-square)](https://packagist.org/packages/your-github-username/laravel-messenger)
-[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/your-github-username/laravel-messenger/run-tests?label=tests)](https://github.com/your-github-username/laravel-messenger/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/your-github-username/laravel-messenger/Check%20&%20fix%20styling?label=code%20style)](https://github.com/your-github-username/laravel-messenger/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/your-github-username/laravel-messenger.svg?style=flat-square)](https://packagist.org/packages/your-github-username/laravel-messenger)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/ihabrouk/messenger.svg?style=flat-square)](https://packagist.org/packages/ihabrouk/messenger)
+[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/ihabrouk/messenger/run-tests?label=tests)](https://github.com/ihabrouk/messenger/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/ihabrouk/messenger/Check%20&%20fix%20styling?label=code%20style)](https://github.com/ihabrouk/messenger/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain)
+[![Total Downloads](https://img.shields.io/packagist/dt/ihabrouk/messenger.svg?style=flat-square)](https://packagist.org/packages/ihabrouk/messenger)
 
 A comprehensive, enterprise-grade messaging package for Laravel with multi-provider support, advanced analytics, GDPR compliance, and real-time monitoring.
 
@@ -49,7 +49,7 @@ A comprehensive, enterprise-grade messaging package for Laravel with multi-provi
 You can install the package via Composer:
 
 ```bash
-composer require your-github-username/laravel-messenger
+composer require ihabrouk/messenger
 ```
 
 Publish the configuration and migrations:
@@ -121,7 +121,7 @@ MESSENGER_CACHE_DRIVER=redis
 ### Basic Message Sending
 
 ```php
-use YourNamespace\LaravelMessenger\Services\MessengerService;
+use ihabrouk\Messenger\Services\MessengerService;
 
 $messenger = app(MessengerService::class);
 
@@ -145,7 +145,7 @@ $message = $messenger->sendTemplate([
 ### Consent Management
 
 ```php
-use YourNamespace\LaravelMessenger\Services\ConsentService;
+use ihabrouk\Messenger\Services\ConsentService;
 
 $consentService = app(ConsentService::class);
 
@@ -192,7 +192,7 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## 📄 Credits
 
-- [Your Name](https://github.com/your-github-username)
+- [Your Name](https://github.com/ihabrouk)
 - [All Contributors](../../contributors)
 
 ## 📄 License
