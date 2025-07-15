@@ -48,20 +48,16 @@ return new class extends Migration
             // Approval workflow
             $table->string('approval_status')->default('draft')->index(); // draft, pending, approved, rejected
             $table->text('approval_notes')->nullable();
+            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('approved_at')->nullable();
-            $table->unsignedBigInteger('approved_by')->nullable();
-
-            // Versioning
-            $table->integer('version')->default(1);
-            $table->foreignId('parent_template_id')->nullable()->constrained('messenger_templates')->nullOnDelete();
 
             $table->timestamps();
             $table->softDeletes();
 
             // Indexes for performance
-            $table->index(['category', 'type', 'is_active']);
-            $table->index(['language', 'is_active']);
-            $table->index(['variant_group', 'is_active']);
+            $table->index(['category', 'type']);
+            $table->index(['is_active', 'approval_status']);
+            $table->index(['variant_group', 'variant_weight']);
         });
     }
 

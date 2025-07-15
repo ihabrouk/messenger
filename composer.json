@@ -1,35 +1,26 @@
 {
     "name": "ihabrouk/messenger",
-    "description": "A comprehensive Laravel package for multi-provider messaging (SMS, WhatsApp) with FilamentPHP integration",
+    "description": "A Laravel package for multi-provider messaging (SMS, WhatsApp, Email) with consent management and analytics",
     "type": "library",
-    "keywords": [
-        "laravel",
-        "messaging",
-        "sms",
-        "whatsapp",
-        "filament",
-        "notifications",
-        "bulk-messaging",
-        "templates"
-    ],
+    "keywords": ["laravel", "sms", "whatsapp", "email", "messaging", "twilio", "consent", "gdpr"],
     "license": "MIT",
     "authors": [
         {
-            "name": "Ismail El Habrouk",
-            "email": "ismailhabrouk@gmail.com"
+            "name": "Ibrahim Habrouk",
+            "email": "ihabrouk@gmail.com"
         }
     ],
     "require": {
-        "php": "^8.2",
-        "laravel/framework": "^11.0|^12.0",
-        "filament/filament": "^3.3",
-        "guzzlehttp/guzzle": "^7.8",
-        "twilio/sdk": "^8.0"
+        "php": "^8.1|^8.2|^8.3",
+        "laravel/framework": "^10.0|^11.0|^12.0",
+        "filament/filament": "^3.0",
+        "guzzlehttp/guzzle": "^7.0",
+        "twilio/sdk": "^7.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^9.0",
-        "pestphp/pest": "^3.0",
-        "pestphp/pest-plugin-laravel": "^3.0"
+        "phpunit/phpunit": "^10.0|^11.0",
+        "orchestra/testbench": "^8.0|^9.0",
+        "laravel/pint": "^1.0"
     },
     "autoload": {
         "psr-4": {
@@ -44,15 +35,16 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Ihabrouk\\Messenger\\MessengerServiceProvider"
-            ]
+                "Ihabrouk\\Messenger\\Providers\\MessengerServiceProvider"
+            ],
+            "aliases": {
+                "Messenger": "Ihabrouk\\Messenger\\Facades\\Messenger"
+            }
         }
     },
-    "config": {
-        "sort-packages": true,
-        "allow-plugins": {
-            "pestphp/pest-plugin": true
-        }
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
     },
     "minimum-stability": "stable",
     "prefer-stable": true

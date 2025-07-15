@@ -59,7 +59,7 @@ return new class extends Migration
             $table->timestamp('last_retry_at')->nullable();
 
             // Relationships with application models
-            $table->morphs('messageable'); // Polymorphic relation to User, Order, etc.
+            $table->nullableMorphs('messageable'); // Polymorphic relation to User, Order, etc.
 
             $table->timestamps();
             $table->softDeletes();
