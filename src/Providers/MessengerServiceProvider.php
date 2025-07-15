@@ -19,7 +19,7 @@ class MessengerServiceProvider extends ServiceProvider
     {
         // Merge configuration
         $this->mergeConfigFrom(
-            __DIR__ . '/../../../config/messenger.php',
+            __DIR__ . '/../../config/messenger.php',
             'messenger'
         );
 
@@ -78,7 +78,7 @@ class MessengerServiceProvider extends ServiceProvider
         // Publish configuration
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../../../config/messenger.php' => config_path('messenger.php'),
+                __DIR__ . '/../../config/messenger.php' => config_path('messenger.php'),
             ], 'messenger-config');
 
             // Publish migrations
