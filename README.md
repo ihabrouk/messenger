@@ -1,11 +1,11 @@
-# Laravel Messenger
+# Laravel / Filamentphp Messenger
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/ihabrouk/messenger.svg?style=flat-square)](https://packagist.org/packages/ihabrouk/messenger)
 [![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/ihabrouk/messenger/run-tests?label=tests)](https://github.com/ihabrouk/messenger/actions?query=workflow%3Arun-tests+branch%3Amain)
 [![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/ihabrouk/messenger/Check%20&%20fix%20styling?label=code%20style)](https://github.com/ihabrouk/messenger/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/ihabrouk/messenger.svg?style=flat-square)](https://packagist.org/packages/ihabrouk/messenger)
 
-A comprehensive, enterprise-grade messaging package for Laravel with multi-provider support, advanced analytics, GDPR compliance, and real-time monitoring.
+A comprehensive, enterprise-grade messaging package for multi-provider support, leveraging Laravel FilamentPHP to provide advanced analytics, GDPR compliance, and real-time monitoring.
 
 ## 🚀 Features
 
