@@ -151,46 +151,27 @@ This package provides ready-to-use Filament actions for seamless integration wit
 Add individual message sending to any Filament resource:
 
 ```php
-<?php
-
-namespace App\Filament\Resources;
-
-use App\Models\User;
-use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use ihabrouk\Messenger\Actions\SendMessageAction;
 
-class UserResource extends Resource
-{
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                // Your columns...
-                Tables\Columns\TextColumn::make('phone')
-                    ->label('Phone Number')
-                    ->searchable(),
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                
-                // Add the Send Message Action
-                SendMessageAction::make()
-                    ->phoneField('phone')      // Map to your phone field
-                    ->nameField('name')        // Map to your name field
-                    ->visible(fn ($record) => !empty($record->phone))
-                    ->modalHeading(fn ($record) => "Send Message to {$record->name}")
-                    ->successNotificationTitle('Message sent successfully!')
-                    ->before(function ($action, $record) {
-                        // Pre-fill the form with recipient data
-                        $action->fillForm([
-                            'recipient_phone' => $record->phone,
-                            'recipient_name' => $record->name,
-                        ]);
-                    }),
+// In your table actions
+->actions([
+    Tables\Actions\EditAction::make(),
+    
+    // Add the Send Message Action
+    SendMessageAction::make()
+        ->phoneField('phone')      // Map to your phone field
+        ->nameField('name')        // Map to your name field
+        ->visible(fn ($record) => !empty($record->phone))
+        ->modalHeading(fn ($record) => "Send Message to {$record->name}")
+        ->successNotificationTitle('Message sent successfully!')
+        ->before(function ($action, $record) {
+            // Pre-fill the form with recipient data
+            $action->fillForm([
+                'recipient_phone' => $record->phone,
+                'recipient_name' => $record->name,
             ]);
-    }
-}
+        }),
+])
 ```
 
 #### Bulk Message Actions
@@ -198,226 +179,54 @@ class UserResource extends Resource
 Send messages to multiple records at once:
 
 ```php
-<?php
-
-namespace App\Filament\Resources;
-
-use App\Models\User;
-use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use ihabrouk\Messenger\Actions\BulkMessageAction;
 
-class UserResource extends Resource
-{
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    
-                    // Add the Bulk Message Action
-                    BulkMessageAction::make()
-                        ->phoneField('phone')       // Map to your phone field
-                        ->nameField('name')         // Map to your name field
-                        ->maxRecipients(1000)       // Set recipient limit
-                        ->requiresConfirmation(true)
-                        ->modalHeading('Send Bulk Message Campaign')
-                        ->successNotificationTitle('Bulk campaign started!')
-                        ->before(function ($action, $records) {
-                            // Validate recipients have phone numbers
-                            $validRecipients = $records->filter(fn ($record) => !empty($record->phone));
-                            
-                            if ($validRecipients->isEmpty()) {
-                                $action->halt();
-                                \Filament\Notifications\Notification::make()
-                                    ->title('No valid recipients')
-                                    ->body('Selected users must have phone numbers.')
-                                    ->danger()
-                                    ->send();
-                                return;
-                            }
-                            
-                            // Pre-fill recipient count
-                            $action->fillForm([
-                                'recipient_count' => $validRecipients->count() . ' valid recipients',
-                            ]);
-                        }),
-                ]),
-            ]);
-    }
-}
+// In your table bulk actions
+->bulkActions([
+    Tables\Actions\BulkActionGroup::make([
+        Tables\Actions\DeleteBulkAction::make(),
+        
+        // Add the Bulk Message Action
+        BulkMessageAction::make()
+            ->phoneField('phone')       // Map to your phone field
+            ->nameField('name')         // Map to your name field
+            ->maxRecipients(1000)       // Set recipient limit
+            ->requiresConfirmation(true)
+            ->modalHeading('Send Bulk Message Campaign')
+            ->successNotificationTitle('Bulk campaign started!')
+            ->before(function ($action, $records) {
+                // Validate recipients have phone numbers
+                $validRecipients = $records->filter(fn ($record) => !empty($record->phone));
+                
+                if ($validRecipients->isEmpty()) {
+                    $action->halt();
+                    \Filament\Notifications\Notification::make()
+                        ->title('No valid recipients')
+                        ->body('Selected users must have phone numbers.')
+                        ->danger()
+                        ->send();
+                    return;
+                }
+                
+                // Pre-fill recipient count
+                $action->fillForm([
+                    'recipient_count' => $validRecipients->count() . ' valid recipients',
+                ]);
+            }),
+    ]),
+])
 ```
 
-#### Complete UserResource Example
+#### Database Requirements
 
-Here's a complete example integrating all messaging features:
+Add a phone field to your model for messaging functionality:
 
 ```php
-<?php
-
-namespace App\Filament\Resources;
-
-use App\Filament\Resources\UserResource\Pages;
-use App\Models\User;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use ihabrouk\Messenger\Actions\SendMessageAction;
-use ihabrouk\Messenger\Actions\BulkMessageAction;
-
-class UserResource extends Resource
-{
-    protected static ?string $model = User::class;
-    protected static ?string $navigationIcon = 'heroicon-o-users';
-
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('phone')
-                    ->label('Phone Number')
-                    ->tel()
-                    ->maxLength(20)
-                    ->helperText('Required for SMS/WhatsApp messaging'),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
-                Forms\Components\TextInput::make('password')
-                    ->password()
-                    ->required()
-                    ->maxLength(255),
-            ]);
-    }
-
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('phone')
-                    ->label('Phone Number')
-                    ->searchable()
-                    ->copyable()
-                    ->copyMessage('Phone number copied!')
-                    ->icon('heroicon-o-phone')
-                    ->badge()
-                    ->color(fn ($state) => $state ? 'success' : 'gray'),
-                Tables\Columns\IconColumn::make('email_verified_at')
-                    ->label('Verified')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-check-badge')
-                    ->falseIcon('heroicon-o-x-mark'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                Tables\Filters\Filter::make('has_phone')
-                    ->label('Has Phone Number')
-                    ->query(fn ($query) => $query->whereNotNull('phone'))
-                    ->toggle(),
-                Tables\Filters\Filter::make('verified')
-                    ->label('Email Verified')
-                    ->query(fn ($query) => $query->whereNotNull('email_verified_at'))
-                    ->toggle(),
-                Tables\Filters\TernaryFilter::make('can_receive_messages')
-                    ->label('Can Receive Messages')
-                    ->queries(
-                        true: fn ($query) => $query->whereNotNull('phone'),
-                        false: fn ($query) => $query->whereNull('phone'),
-                    ),
-            ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                
-                // Individual Send Message Action
-                SendMessageAction::make()
-                    ->phoneField('phone')
-                    ->nameField('name')
-                    ->visible(fn ($record) => !empty($record->phone))
-                    ->tooltip('Send SMS/WhatsApp message'),
-                
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\DeleteAction::make(),
-                    Tables\Actions\Action::make('verify_email')
-                        ->icon('heroicon-o-check-badge')
-                        ->action(fn ($record) => $record->markEmailAsVerified())
-                        ->visible(fn ($record) => !$record->hasVerifiedEmail()),
-                ]),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    
-                    // Bulk Message Action
-                    BulkMessageAction::make()
-                        ->phoneField('phone')
-                        ->nameField('name')
-                        ->maxRecipients(500)
-                        ->icon('heroicon-o-megaphone')
-                        ->color('success'),
-                        
-                    Tables\Actions\BulkAction::make('verify_emails')
-                        ->label('Verify Emails')
-                        ->icon('heroicon-o-check-badge')
-                        ->action(function ($records) {
-                            $records->each->markEmailAsVerified();
-                        })
-                        ->deselectRecordsAfterCompletion(),
-                ]),
-            ]);
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListUsers::route('/'),
-            'create' => Pages\CreateUser::route('/create'),
-            'view' => Pages\ViewUser::route('/{record}'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
-        ];
-    }
-}
+// In a migration
+Schema::table('users', function (Blueprint $table) {
+    $table->string('phone', 20)->nullable()->after('email');
+});
 ```
-
-### 📊 Action Features
-
-#### SendMessageAction Features
-
-- **Provider Selection**: Choose from Twilio, AWS SNS, SMS Misr, etc.
-- **Channel Support**: SMS, WhatsApp, Email
-- **Template Integration**: Use predefined templates with variables
-- **Custom Messages**: Send ad-hoc messages
-- **Real-time Preview**: See message preview with variables filled
-- **Character Counter**: Track SMS segments and costs
-- **Scheduling**: Schedule messages for later delivery
-- **Validation**: Phone number format validation
-
-#### BulkMessageAction Features
-
-- **Campaign Management**: Named campaigns with tracking
-- **Batch Processing**: Send in configurable batches to avoid rate limits
-- **Template Variables**: Per-recipient variable substitution
-- **Progress Tracking**: Real-time progress monitoring
-- **Cost Estimation**: Calculate costs before sending
-- **Scheduling**: Schedule bulk campaigns
-- **Consent Checking**: GDPR-compliant consent verification
-- **Error Handling**: Graceful failure handling with retries
 
 ### 🎛️ Action Configuration
 
@@ -434,7 +243,7 @@ SendMessageAction::make()
     ->requiresConfirmation(false)           // Disable confirmation
     ->successNotificationTitle('SMS Sent!') // Custom success message
     ->before(function ($action, $record) {
-        // Custom logic before sending
+        // Custom validation before sending
         if (!$record->consent_marketing) {
             $action->halt();
             Notification::make()
