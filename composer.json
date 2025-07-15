@@ -24,7 +24,7 @@
     ],
     "require": {
         "php": "^8.2",
-        "laravel/framework": "^12.0",
+        "laravel/framework": "^11.0|^12.0",
         "filament/filament": "^3.3",
         "livewire/livewire": "^3.0",
         "spatie/laravel-permission": "^6.0",
@@ -39,18 +39,18 @@
     },
     "autoload": {
         "psr-4": {
-            "YourNamespace\\LaravelMessenger\\": "src/"
+            "ihabrouk\\Messenger\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "YourNamespace\\LaravelMessenger\\Tests\\": "tests/"
+            "ihabrouk\\Messenger\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "YourNamespace\\LaravelMessenger\\Providers\\MessengerServiceProvider"
+                "ihabrouk\\Messenger\\Providers\\MessengerServiceProvider"
             ]
         }
     },
