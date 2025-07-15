@@ -88,12 +88,12 @@ class MessengerServiceProvider extends ServiceProvider
 
             // Publish views
             $this->publishes([
-                __DIR__ . '/../../../Resources/views/components/messenger/' => resource_path('views/components/messenger'),
+                __DIR__ . '/../Resources/views/components/messenger/' => resource_path('views/components/messenger'),
             ], 'messenger-views');
 
             // Publish language files
             $this->publishes([
-                __DIR__ . '/../../../Resources/lang/en/messenger.php' => lang_path('en/messenger.php'),
+                __DIR__ . '/../Resources/lang/en/messenger.php' => lang_path('en/messenger.php'),
             ], 'messenger-lang');
         }
 
@@ -101,10 +101,10 @@ class MessengerServiceProvider extends ServiceProvider
         // $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
         // Load views
-        $this->loadViewsFrom(__DIR__ . '/../../../Resources/views', 'messenger');
+        $this->loadViewsFrom(__DIR__ . '/../Resources/views', 'messenger');
 
         // Load translations
-        $this->loadTranslationsFrom(__DIR__ . '/../../../Resources/lang', 'messenger');
+        $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'messenger');
 
         // Auto-discover and register providers
         $registry = $this->app->make(\Ihabrouk\Messenger\Contracts\ProviderRegistryInterface::class);
