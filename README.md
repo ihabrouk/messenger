@@ -26,6 +26,27 @@ You can install the package via composer:
 composer require ihabrouk/messenger
 ```
 
+### Quick Setup
+```bash
+# Publish and run migrations (REQUIRED)
+php artisan vendor:publish --provider="Ihabrouk\Messenger\Providers\MessengerServiceProvider" --tag="messenger-migrations"
+php artisan migrate
+
+# Publish configuration
+php artisan vendor:publish --provider="Ihabrouk\Messenger\Providers\MessengerServiceProvider" --tag="messenger-config"
+```
+
+### Installation Issues?
+If you encounter "Class not found" errors:
+
+```bash
+# Run diagnostic command
+php artisan messenger:diagnose
+
+# See emergency fix guide
+# Check EMERGENCY_FIX.md for detailed troubleshooting
+```
+
 ## Configuration
 
 Publish the configuration file:
@@ -223,6 +244,27 @@ Event::listen(MessageSent::class, function ($event) {
     // Handle successful message sending
     Log::info('Message sent', ['message_id' => $event->message->id]);
 });
+```
+
+## Troubleshooting
+
+### Diagnostic Command
+```bash
+# Run this to diagnose installation issues
+php artisan messenger:diagnose
+```
+
+### Common Issues
+- **"Class not found" errors**: See [EMERGENCY_FIX.md](EMERGENCY_FIX.md)
+- **Migration issues**: See [INSTALLATION_TROUBLESHOOTING.md](INSTALLATION_TROUBLESHOOTING.md)
+- **Provider setup**: See [INSTALLATION.md](INSTALLATION.md)
+
+### Available Commands
+```bash
+php artisan messenger:diagnose              # Diagnose installation issues
+php artisan messenger:list-providers        # List available providers
+php artisan messenger:test-provider         # Test provider configuration
+php artisan messenger:send                  # Send a test message
 ```
 
 ## Testing
