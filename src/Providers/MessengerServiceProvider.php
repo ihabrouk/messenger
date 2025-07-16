@@ -66,6 +66,7 @@ class MessengerServiceProvider extends ServiceProvider
                 \Ihabrouk\Messenger\Commands\CleanupLogsCommand::class,
                 \Ihabrouk\Messenger\Commands\MessengerAutomationCommand::class,
                 \Ihabrouk\Messenger\Commands\MessengerStatusCommand::class,
+                \Ihabrouk\Messenger\Commands\DiagnoseInstallationCommand::class,
             ]);
         }
     }
@@ -142,6 +143,7 @@ class MessengerServiceProvider extends ServiceProvider
                 \Ihabrouk\Messenger\Commands\ListProvidersCommand::class,
                 \Ihabrouk\Messenger\Commands\ProcessWebhookCommand::class,
                 \Ihabrouk\Messenger\Commands\CleanupLogsCommand::class,
+                \Ihabrouk\Messenger\Commands\DiagnoseInstallationCommand::class,
             ]);
         }
     }
