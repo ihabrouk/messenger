@@ -8,19 +8,60 @@ Install the package via Composer:
 composer require ihabrouk/messenger
 ```
 
-## Configuration
+## Required Setup Steps
 
-1. Publish the config file:
-```bash
-php artisan vendor:publish --tag=messenger-config
-```
+### 1. Publish and Run Migrations (REQUIRED)
+The package models require database tables to function:
 
-2. Run the migrations:
 ```bash
+# Publish migrations
+php artisan vendor:publish --provider="Ihabrouk\Messenger\Providers\MessengerServiceProvider" --tag="messenger-migrations"
+
+# Run migrations to create required tables
 php artisan migrate
 ```
 
-3. Configure your messaging providers in `config/messenger.php`
+**Alternative if the above doesn't work:**
+```bash
+# Publish all package assets
+php artisan vendor:publish --provider="Ihabrouk\Messenger\Providers\MessengerServiceProvider"
+
+# Or copy migrations manually (if needed)
+php artisan vendor:publish --tag="messenger-migrations" --force
+```
+
+### 2. Publish Configuration
+```bash
+php artisan vendor:publish --provider="Ihabrouk\Messenger\Providers\MessengerServiceProvider" --tag="messenger-config"
+```
+
+### 3. Configure Providers
+Edit `config/messenger.php` to configure your messaging providers (Twilio, SMS Misr, etc.)
+
+## Optional Setup
+
+### Publish Views (if you plan to customize them)
+```bash
+php artisan vendor:publish --provider="Ihabrouk\Messenger\Providers\MessengerServiceProvider" --tag="messenger-views"
+```
+
+### Publish Language Files (for localization)
+```bash
+php artisan vendor:publish --provider="Ihabrouk\Messenger\Providers\MessengerServiceProvider" --tag="messenger-lang"
+```
+
+## Verification
+
+To verify the installation worked correctly, run in `php artisan tinker`:
+```php
+// Check if models are available
+\Ihabrouk\Messenger\Models\Batch::count();
+\Ihabrouk\Messenger\Models\Message::count();
+```
+
+## Troubleshooting
+
+If you encounter "Class not found" errors, see [INSTALLATION_TROUBLESHOOTING.md](INSTALLATION_TROUBLESHOOTING.md) for detailed solutions.
 
 ## Usage
 

@@ -83,7 +83,7 @@ class MessengerServiceProvider extends ServiceProvider
 
             // Publish migrations
             $this->publishes([
-                __DIR__ . '/../database/migrations/' => database_path('migrations'),
+                __DIR__ . '/../Database/migrations/' => database_path('migrations'),
             ], 'messenger-migrations');
 
             // Publish views
@@ -97,14 +97,20 @@ class MessengerServiceProvider extends ServiceProvider
             ], 'messenger-lang');
         }
 
-        // Load migrations - commented out as migrations are now in database/migrations directory
-        // $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        // Load migrations - commented out as migrations are now in Database/migrations directory
+        // $this->loadMigrationsFrom(__DIR__ . '/../Database/migrations');
 
-        // Load views
-        $this->loadViewsFrom(__DIR__ . '/../Resources/views', 'messenger');
+        // Load views (only if directory exists)
+        $viewsPath = __DIR__ . '/../Resources/views';
+        if (is_dir($viewsPath)) {
+            $this->loadViewsFrom($viewsPath, 'messenger');
+        }
 
-        // Load translations
-        $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'messenger');
+        // Load translations (only if directory exists)
+        $langPath = __DIR__ . '/../Resources/lang';
+        if (is_dir($langPath)) {
+            $this->loadTranslationsFrom($langPath, 'messenger');
+        }
 
         // Auto-discover and register providers
         $registry = $this->app->make(\Ihabrouk\Messenger\Contracts\ProviderRegistryInterface::class);
@@ -168,7 +174,7 @@ class MessengerServiceProvider extends ServiceProvider
         // Message events
         $events->listen(
             \Ihabrouk\Messenger\Events\MessageSent::class,
-            \Ihabrouk\Messenger\Listeners\LogMessageDelivery::class
+            \Ihabrouk\Messenger\Listeners\LogMessageSent::class
         );
 
         $events->listen(
@@ -178,18 +184,7 @@ class MessengerServiceProvider extends ServiceProvider
 
         $events->listen(
             \Ihabrouk\Messenger\Events\MessageDelivered::class,
-            \Ihabrouk\Messenger\Listeners\UpdateDeliveryStatus::class
-        );
-
-        // Bulk message events
-        $events->listen(
-            \Ihabrouk\Messenger\Events\BulkMessageStarted::class,
-            \Ihabrouk\Messenger\Listeners\TrackBulkProgress::class
-        );
-
-        $events->listen(
-            \Ihabrouk\Messenger\Events\BulkMessageCompleted::class,
-            \Ihabrouk\Messenger\Listeners\NotifyBulkCompletion::class
+            \Ihabrouk\Messenger\Listeners\LogMessageDelivered::class
         );
     }
 
