@@ -63,6 +63,7 @@ class TemplateService implements TemplateServiceInterface
         if (!empty($validationErrors)) {
             throw new MessengerException(
                 'Template validation failed: ' . implode(', ', $validationErrors),
+                'TEMPLATE_VALIDATION_FAILED',
                 ['template_id' => $template->id, 'errors' => $validationErrors]
             );
         }
@@ -72,6 +73,7 @@ class TemplateService implements TemplateServiceInterface
         if (!empty($variableErrors)) {
             throw new MessengerException(
                 'Template variable validation failed: ' . implode(', ', $variableErrors),
+                'TEMPLATE_VARIABLE_VALIDATION_FAILED',
                 ['template_id' => $template->id, 'errors' => $variableErrors]
             );
         }
@@ -107,6 +109,7 @@ class TemplateService implements TemplateServiceInterface
         if (!$template) {
             throw new MessengerException(
                 "Template not found: {$templateName}",
+                'TEMPLATE_NOT_FOUND',
                 ['template_name' => $templateName]
             );
         }

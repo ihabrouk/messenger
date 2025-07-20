@@ -48,6 +48,7 @@ class MessengerService implements MessengerServiceInterface
         if (!$this->circuitBreaker->isAvailable($data->provider)) {
             throw new MessengerException(
                 "Provider {$data->provider} is currently unavailable (circuit breaker open)",
+                'PROVIDER_UNAVAILABLE',
                 ['provider' => $data->provider, 'circuit_breaker' => 'open']
             );
         }
