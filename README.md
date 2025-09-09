@@ -18,6 +18,26 @@ A comprehensive Laravel package for multi-provider messaging (SMS, WhatsApp) wit
 - 🛡️ **Circuit Breaker**: Automatic failover for provider reliability
 - 🎯 **Automation**: Triggered messaging based on events
 
+## Version Support
+
+| Version | Laravel | Filament | PHP | Status |
+|---------|---------|----------|-----|--------|
+| **2.x** | 11.0+ | 4.0+ | 8.2+ | ✅ Active Development |
+| **1.x** | 10.0-11.x | 3.0+ | 8.1+ | 🔧 Maintenance |
+
+### Choosing Your Version
+
+- **Use v2.x** if you're on Laravel 11+ and can upgrade to Filament v4
+- **Use v1.x** if you need to stay on Laravel 10 or Filament v3
+
+```bash
+# For new projects (recommended)
+composer require "ihabrouk/messenger:^2.0"
+
+# For projects using Filament v3
+composer require "ihabrouk/messenger:^1.0"
+```
+
 ## Installation
 
 You can install the package via composer:
