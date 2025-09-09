@@ -1,8 +1,44 @@
 # Release Notes Summary
 
-## 🎉 Version 2.0.1 (Latest - Recommended)
+## 🎉 Version 2.0.2 (Latest - Recommended)
 **Release Date:** September 9, 2025  
 **Target:** Modern Laravel/Filament projects
+
+### 🐛 **Critical Fix**
+- **FIXED:** Method names in documentation and examples
+  - `phoneColumn()` → `phoneField()` ✅ 
+  - `nameColumn()` → `nameField()` ✅
+- Updated all documentation with correct method names
+- Fixed examples to prevent "Method does not exist" errors
+
+### 📦 Installation
+```bash
+composer require "ihabrouk/messenger:^2.0"
+```
+
+### 🔧 Migration from Previous Docs
+If you followed our previous documentation, update your code:
+```php
+// OLD (from incorrect docs)
+SendMessageAction::make()
+    ->phoneColumn('phone')
+    ->nameColumn('name')
+
+// NEW (correct)
+SendMessageAction::make()
+    ->phoneField('phone') 
+    ->nameField('name')
+```
+
+### 🔧 Requirements
+- Laravel 11.0+
+- Filament 4.0+
+- PHP 8.2+
+
+---
+
+## 🎉 Version 2.0.1
+**Release Date:** September 9, 2025
 
 ### ✨ What's New
 - Laravel 12.28.1 support (latest version)
