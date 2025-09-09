@@ -2,6 +2,8 @@
 
 namespace Ihabrouk\Messenger\Testing;
 
+use Exception;
+use DateTime;
 use Ihabrouk\Messenger\Contracts\MessageProviderInterface;
 use Ihabrouk\Messenger\Data\SendMessageData;
 use Ihabrouk\Messenger\Enums\MessageStatus;
@@ -78,7 +80,7 @@ class ProviderTestHelper
                     'cost' => $response->cost,
                 ]
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->addTestResult('send_message', [
                 'status' => 'failed',
                 'message' => 'Failed to send message: ' . $e->getMessage(),
@@ -117,7 +119,7 @@ class ProviderTestHelper
                     'message_ids' => collect($responses)->pluck('providerMessageId')->toArray(),
                 ]
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->addTestResult('send_bulk_message', [
                 'status' => 'failed',
                 'message' => 'Failed to send bulk messages: ' . $e->getMessage(),
@@ -142,7 +144,7 @@ class ProviderTestHelper
                     'is_numeric' => is_numeric($balance)
                 ]
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->addTestResult('get_balance', [
                 'status' => 'failed',
                 'message' => 'Failed to get balance: ' . $e->getMessage(),
@@ -164,7 +166,7 @@ class ProviderTestHelper
                 'message' => 'Provider health status: ' . ($isHealthy ? 'healthy' : 'unhealthy'),
                 'response' => ['is_healthy' => $isHealthy]
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->addTestResult('health_check', [
                 'status' => 'failed',
                 'message' => 'Health check failed: ' . $e->getMessage(),
@@ -189,7 +191,7 @@ class ProviderTestHelper
                     'count' => count($channels)
                 ]
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->addTestResult('supported_channels', [
                 'status' => 'failed',
                 'message' => 'Failed to get supported types: ' . $e->getMessage(),
@@ -211,7 +213,7 @@ class ProviderTestHelper
                 'message' => 'Webhook verification test completed',
                 'response' => ['verification_result' => $isValid]
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->addTestResult('webhook_verification', [
                 'status' => 'failed',
                 'message' => 'Webhook verification failed: ' . $e->getMessage(),
@@ -243,7 +245,7 @@ class ProviderTestHelper
                     'status' => $response->status->value
                 ]
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->addTestResult('otp_capability', [
                 'status' => 'failed',
                 'message' => 'Failed to send OTP: ' . $e->getMessage(),
@@ -274,7 +276,7 @@ class ProviderTestHelper
                     'status' => $response->status->value
                 ]
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->addTestResult('whatsapp_capability', [
                 'status' => 'failed',
                 'message' => 'Failed to send WhatsApp message: ' . $e->getMessage(),
@@ -312,7 +314,7 @@ class ProviderTestHelper
                     'all_successful' => collect($responses)->every(fn($r) => $r->success)
                 ]
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->addTestResult('bulk_capability', [
                 'status' => 'failed',
                 'message' => 'Failed to test bulk capability: ' . $e->getMessage(),
@@ -331,7 +333,7 @@ class ProviderTestHelper
                 to: '+201234567890',
                 message: 'Scheduled test message',
                 type: MessageType::SMS,
-                scheduledAt: new \DateTime('+1 hour')
+                scheduledAt: new DateTime('+1 hour')
             );
 
             $response = $this->provider->send($scheduledData);
@@ -344,7 +346,7 @@ class ProviderTestHelper
                     'status' => $response->status->value
                 ]
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->addTestResult('scheduling_capability', [
                 'status' => 'failed',
                 'message' => 'Failed to test scheduling capability: ' . $e->getMessage(),

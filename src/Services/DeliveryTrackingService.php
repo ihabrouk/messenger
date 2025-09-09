@@ -2,6 +2,8 @@
 
 namespace Ihabrouk\Messenger\Services;
 
+use InvalidArgumentException;
+use Exception;
 use Ihabrouk\Messenger\Models\Message;
 use Ihabrouk\Messenger\Models\Webhook;
 use Ihabrouk\Messenger\Enums\MessageStatus;
@@ -39,7 +41,7 @@ class DeliveryTrackingService
                 'sms_misr' => $this->processSMSMisrWebhook($payload),
                 'twilio' => $this->processTwilioWebhook($payload),
                 'mocktest' => $this->processMockTestWebhook($payload),
-                default => throw new \InvalidArgumentException("Unsupported provider: {$provider}")
+                default => throw new InvalidArgumentException("Unsupported provider: {$provider}")
             };
 
             // Update webhook status
@@ -51,7 +53,7 @@ class DeliveryTrackingService
 
             return $result;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Webhook processing failed', [
                 'provider' => $provider,
                 'error' => $e->getMessage(),

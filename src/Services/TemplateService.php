@@ -2,6 +2,8 @@
 
 namespace Ihabrouk\Messenger\Services;
 
+use Exception;
+use Illuminate\Cache\RedisStore;
 use Ihabrouk\Messenger\Contracts\TemplateServiceInterface;
 use Ihabrouk\Messenger\Models\Template;
 use Ihabrouk\Messenger\Enums\MessageProvider;
@@ -335,7 +337,7 @@ class TemplateService implements TemplateServiceInterface
         try {
             $rendered = $this->render($template, $variables);
             return mb_strlen($rendered, 'UTF-8');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Fallback to estimated length
             return $this->estimateRenderedLength($template);
         }
@@ -362,7 +364,7 @@ class TemplateService implements TemplateServiceInterface
                 'variables_used' => $previewVariables,
                 'sms_segments' => max(1, ceil($characterCount / 160)),
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [
                 'success' => false,
                 'error' => $e->getMessage(),
@@ -619,7 +621,7 @@ class TemplateService implements TemplateServiceInterface
     {
         // This is a simplified implementation
         // In production, you might want to use Redis SCAN or implement a tag-based cache
-        if (Cache::getStore() instanceof \Illuminate\Cache\RedisStore) {
+        if (Cache::getStore() instanceof RedisStore) {
             $redis = Cache::getStore()->getRedis();
             $keys = $redis->keys($pattern);
             if (!empty($keys)) {

@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Drivers;
 
+use Ihabrouk\Messenger\Data\MessageResponse;
 use Ihabrouk\Messenger\Contracts\MessageProviderInterface;
 use Ihabrouk\Messenger\Contracts\ProviderDefinitionInterface;
 use Ihabrouk\Messenger\Data\ProviderDefinition;
@@ -38,10 +39,10 @@ class MockTestDriver extends AbstractProvider implements MessageProviderInterfac
     /**
      * Send a single message
      */
-    public function send(\Ihabrouk\Messenger\Data\SendMessageData $data): \Ihabrouk\Messenger\Data\MessageResponse
+    public function send(SendMessageData $data): MessageResponse
     {
         // Mock successful response
-        return \Ihabrouk\Messenger\Data\MessageResponse::success(
+        return MessageResponse::success(
             providerId: 'mocktest',
             providerMessageId: 'mock_' . uniqid(),
             cost: 0.10,

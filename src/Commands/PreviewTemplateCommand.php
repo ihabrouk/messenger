@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Commands;
 
+use Exception;
 use Ihabrouk\Messenger\Services\TemplateService;
 use Ihabrouk\Messenger\Models\Template;
 use Illuminate\Console\Command;
@@ -40,7 +41,7 @@ class PreviewTemplateCommand extends Command
             $this->displayPreview($preview);
 
             return 0;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Failed to preview template: " . $e->getMessage());
             return 1;
         }

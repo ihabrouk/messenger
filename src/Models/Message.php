@@ -2,6 +2,9 @@
 
 namespace Ihabrouk\Messenger\Models;
 
+use Ihabrouk\Messenger\Data\SendMessageData;
+use Ihabrouk\Messenger\Enums\MessagePriority;
+use Ihabrouk\Messenger\Database\Factories\MessageFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -337,16 +340,16 @@ class Message extends Model
     /**
      * Convert message to SendMessageData for sending
      */
-    public function toSendData(): \Ihabrouk\Messenger\Data\SendMessageData
+    public function toSendData(): SendMessageData
     {
-        return new \Ihabrouk\Messenger\Data\SendMessageData(
+        return new SendMessageData(
             $this->to,
             $this->body,
             $this->provider,
             $this->channel,
             $this->template_id,
             $this->variables ?? [],
-            $this->priority ?? \Ihabrouk\Messenger\Enums\MessagePriority::NORMAL,
+            $this->priority ?? MessagePriority::NORMAL,
             $this->scheduled_at,
             $this->messageable_type,
             $this->messageable_id
@@ -360,6 +363,6 @@ class Message extends Model
      */
     protected static function newFactory()
     {
-        return \Ihabrouk\Messenger\Database\Factories\MessageFactory::new();
+        return MessageFactory::new();
     }
 }

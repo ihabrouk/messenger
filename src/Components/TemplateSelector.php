@@ -2,14 +2,14 @@
 
 namespace Ihabrouk\Messenger\Components;
 
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Ihabrouk\Messenger\Models\Template;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 
 class TemplateSelector extends Component
 {

@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Services;
 
+use InvalidArgumentException;
 use Ihabrouk\Messenger\Contracts\ProviderRegistryInterface;
 use Ihabrouk\Messenger\Contracts\MessageProviderInterface;
 use Ihabrouk\Messenger\Exceptions\MessengerException;
@@ -71,7 +72,7 @@ class ProviderRegistry implements ProviderRegistryInterface
     public function make(string $name): MessageProviderInterface
     {
         if (!$this->isRegistered($name)) {
-            throw new \InvalidArgumentException("Provider '{$name}' is not registered");
+            throw new InvalidArgumentException("Provider '{$name}' is not registered");
         }
 
         $className = $this->providers[$name];

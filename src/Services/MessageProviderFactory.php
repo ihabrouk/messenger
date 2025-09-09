@@ -2,6 +2,9 @@
 
 namespace Ihabrouk\Messenger\Services;
 
+use Exception;
+use Ihabrouk\Messenger\Drivers\SmsMisrDriver;
+use Ihabrouk\Messenger\Drivers\TwilioDriver;
 use Ihabrouk\Messenger\Contracts\MessageProviderInterface;
 use Ihabrouk\Messenger\Contracts\ProviderRegistryInterface;
 use Ihabrouk\Messenger\Exceptions\ProviderExceptionFactory;
@@ -66,7 +69,7 @@ class MessageProviderFactory
 
             $this->instances[$providerName] = $instance;
             return $instance;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw ProviderExceptionFactory::configurationError(
                 $providerName,
                 "Failed to create provider instance: {$e->getMessage()}",
@@ -130,7 +133,7 @@ class MessageProviderFactory
         try {
             $provider = $this->make($providerName);
             return in_array($messageType, $provider->getSupportedTypes());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -149,7 +152,7 @@ class MessageProviderFactory
                     'healthy' => $provider->isHealthy(),
                     'error' => null,
                 ];
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $status[$providerName] = [
                     'healthy' => false,
                     'error' => $e->getMessage(),
@@ -166,8 +169,8 @@ class MessageProviderFactory
     protected function getDriverClass(string $driver): string
     {
         $driverMap = [
-            'smsmisr' => \Ihabrouk\Messenger\Drivers\SmsMisrDriver::class,
-            'twilio' => \Ihabrouk\Messenger\Drivers\TwilioDriver::class,
+            'smsmisr' => SmsMisrDriver::class,
+            'twilio' => TwilioDriver::class,
         ];
 
         return $driverMap[$driver] ?? "\\App\\Messenger\\Drivers\\" . ucfirst($driver) . "Driver";

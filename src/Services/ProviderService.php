@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Services;
 
+use Exception;
 use Ihabrouk\Messenger\Contracts\ProviderRegistryInterface;
 use Ihabrouk\Messenger\Enums\MessageCapability;
 
@@ -66,7 +67,7 @@ class ProviderService
                     'display_name' => ucfirst($name),
                     'capabilities' => $instance->getCapabilities(),
                 ];
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Skip providers that can't be instantiated
                 continue;
             }

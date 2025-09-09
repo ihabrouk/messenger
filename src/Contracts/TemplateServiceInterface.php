@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Contracts;
 
+use Illuminate\Database\Eloquent\Collection;
 use Ihabrouk\Messenger\Models\Template;
 
 /**
@@ -69,12 +70,12 @@ interface TemplateServiceInterface
     /**
      * Get templates by category
      */
-    public function getByCategory(string $category): \Illuminate\Database\Eloquent\Collection;
+    public function getByCategory(string $category): Collection;
 
     /**
      * Get templates by channel
      */
-    public function getByChannel(string $channel): \Illuminate\Database\Eloquent\Collection;
+    public function getByChannel(string $channel): Collection;
 
     /**
      * Calculate message cost

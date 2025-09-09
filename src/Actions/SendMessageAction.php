@@ -2,11 +2,21 @@
 
 namespace Ihabrouk\Messenger\Actions;
 
+use Filament\Actions\Action;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Placeholder;
+use Exception;
 use Ihabrouk\Messenger\Services\MessengerService;
 use Ihabrouk\Messenger\Data\SendMessageData;
 use Ihabrouk\Messenger\Models\Template;
 use Ihabrouk\Messenger\Enums\TemplateCategory;
-use Filament\Tables\Actions\Action;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
@@ -37,14 +47,14 @@ class SendMessageAction extends Action
             ->modalWidth('2xl');
 
         $this->form([
-            Forms\Components\Section::make('Recipient Information')
+            Section::make('Recipient Information')
                 ->schema([
-                    Forms\Components\TextInput::make('recipient_phone')
+                    TextInput::make('recipient_phone')
                         ->label('Phone Number')
                         ->disabled()
                         ->dehydrated(false),
 
-                    Forms\Components\TextInput::make('recipient_name')
+                    TextInput::make('recipient_name')
                         ->label('Recipient Name')
                         ->disabled()
                         ->dehydrated(false),
@@ -52,9 +62,9 @@ class SendMessageAction extends Action
                 ->columns(2)
                 ->collapsible(),
 
-            Forms\Components\Section::make('Message Configuration')
+            Section::make('Message Configuration')
                 ->schema([
-                    Forms\Components\Select::make('provider')
+                    Select::make('provider')
                         ->label('Provider')
                         ->options([
                             'smsmisr' => 'SMS Misr (SMS)',
@@ -64,16 +74,16 @@ class SendMessageAction extends Action
                         ->default('smsmisr')
                         ->required()
                         ->live()
-                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                        ->afterStateUpdated(function ($state, Set $set) {
                             // Update channel options based on provider
                             if ($state === 'smsmisr') {
                                 $set('channel', 'sms');
                             }
                         }),
 
-                    Forms\Components\Select::make('channel')
+                    Select::make('channel')
                         ->label('Channel')
-                        ->options(function (Forms\Get $get) {
+                        ->options(function (Get $get) {
                             $provider = $get('provider');
                             return match($provider) {
                                 'smsmisr' => ['sms' => 'SMS'],
@@ -88,7 +98,7 @@ class SendMessageAction extends Action
                         ->required()
                         ->live(),
 
-                    Forms\Components\Select::make('message_category')
+                    Select::make('message_category')
                         ->label('Message Category')
                         ->options([
                             TemplateCategory::TRANSACTIONAL->value => TemplateCategory::TRANSACTIONAL->label(),
@@ -100,22 +110,22 @@ class SendMessageAction extends Action
                 ])
                 ->columns(3),
 
-            Forms\Components\Section::make('Message Content')
+            Section::make('Message Content')
                 ->schema([
-                    Forms\Components\Toggle::make('use_template')
+                    Toggle::make('use_template')
                         ->label('Use Template')
                         ->default(false)
                         ->live()
-                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                        ->afterStateUpdated(function ($state, Set $set) {
                             if (!$state) {
                                 $set('template_id', null);
                                 $set('variables', []);
                             }
                         }),
 
-                    Forms\Components\Select::make('template_id')
+                    Select::make('template_id')
                         ->label('Template')
-                        ->options(function (Forms\Get $get) {
+                        ->options(function (Get $get) {
                             $channel = $get('channel') ?? 'sms';
                             return Template::where('is_active', true)
                                 ->where('approval_status', 'approved')
@@ -125,8 +135,8 @@ class SendMessageAction extends Action
                         })
                         ->searchable()
                         ->live()
-                        ->visible(fn (Forms\Get $get) => $get('use_template'))
-                        ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
+                        ->visible(fn (Get $get) => $get('use_template'))
+                        ->afterStateUpdated(function ($state, Set $set, Get $get) {
                             if ($state) {
                                 $template = Template::find($state);
                                 if ($template) {
@@ -141,11 +151,11 @@ class SendMessageAction extends Action
                             }
                         }),
 
-                    Forms\Components\KeyValue::make('variables')
+                    KeyValue::make('variables')
                         ->label('Template Variables')
-                        ->visible(fn (Forms\Get $get) => $get('use_template') && $get('template_id'))
+                        ->visible(fn (Get $get) => $get('use_template') && $get('template_id'))
                         ->live()
-                        ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
+                        ->afterStateUpdated(function ($state, Set $set, Get $get) {
                             // Update preview with variables
                             $templateId = $get('template_id');
                             if ($templateId && $state) {
@@ -160,35 +170,35 @@ class SendMessageAction extends Action
                             }
                         }),
 
-                    Forms\Components\Textarea::make('custom_message')
+                    Textarea::make('custom_message')
                         ->label('Custom Message')
                         ->rows(4)
                         ->maxLength(1600)
                         ->live(debounce: 500)
-                        ->visible(fn (Forms\Get $get) => !$get('use_template'))
-                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                        ->visible(fn (Get $get) => !$get('use_template'))
+                        ->afterStateUpdated(function ($state, Set $set) {
                             $set('character_count', mb_strlen($state ?? ''));
                         }),
 
-                    Forms\Components\Placeholder::make('template_preview')
+                    Placeholder::make('template_preview')
                         ->label('Message Preview')
-                        ->content(fn (Forms\Get $get) => $get('template_preview') ?? 'Template preview will appear here...')
-                        ->visible(fn (Forms\Get $get) => $get('use_template')),
+                        ->content(fn (Get $get) => $get('template_preview') ?? 'Template preview will appear here...')
+                        ->visible(fn (Get $get) => $get('use_template')),
 
-                    Forms\Components\TextInput::make('character_count')
+                    TextInput::make('character_count')
                         ->label('Character Count')
                         ->disabled()
                         ->dehydrated(false)
-                        ->visible(fn (Forms\Get $get) => !$get('use_template'))
+                        ->visible(fn (Get $get) => !$get('use_template'))
                         ->helperText('SMS: 160 chars per part, WhatsApp: 4096 chars max'),
                 ])
                 ->columns(1),
 
-            Forms\Components\Section::make('Cost Estimation')
+            Section::make('Cost Estimation')
                 ->schema([
-                    Forms\Components\Placeholder::make('estimated_cost')
+                    Placeholder::make('estimated_cost')
                         ->label('Estimated Cost')
-                        ->content(function (Forms\Get $get) {
+                        ->content(function (Get $get) {
                             $provider = $get('provider');
                             $channel = $get('channel');
                             $message = $get('use_template') ? $get('template_preview') : $get('custom_message');
@@ -216,9 +226,9 @@ class SendMessageAction extends Action
                             return '$' . number_format($cost, 3);
                         }),
 
-                    Forms\Components\Placeholder::make('message_segments')
+                    Placeholder::make('message_segments')
                         ->label('Message Segments')
-                        ->content(function (Forms\Get $get) {
+                        ->content(function (Get $get) {
                             $channel = $get('channel');
                             $message = $get('use_template') ? $get('template_preview') : $get('custom_message');
 
@@ -305,7 +315,7 @@ class SendMessageAction extends Action
                     ->body("Message sent to {$recipientPhone}")
                     ->success()
                     ->actions([
-                        \Filament\Notifications\Actions\Action::make('view_logs')
+                        Action::make('view_logs')
                             ->label('View Logs')
                             ->url(route('filament.admin.resources.message-logs.index'))
                             ->openUrlInNewTab(),
@@ -319,7 +329,7 @@ class SendMessageAction extends Action
                     ->send();
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Notification::make()
                 ->title('Error Sending Message')
                 ->body($e->getMessage())

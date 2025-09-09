@@ -2,6 +2,8 @@
 
 namespace Ihabrouk\Messenger\Drivers;
 
+use Exception;
+use DateTime;
 use Ihabrouk\Messenger\Contracts\ProviderDefinitionInterface;
 use Ihabrouk\Messenger\Data\SendMessageData;
 use Ihabrouk\Messenger\Data\MessageResponse;
@@ -86,7 +88,7 @@ class TwilioDriver extends AbstractProvider implements ProviderDefinitionInterfa
             ]);
 
             return (float) ($response['balance'] ?? 0.0);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logActivity('Balance check failed', ['error' => $e->getMessage()]);
             return 0.0;
         }
@@ -119,7 +121,7 @@ class TwilioDriver extends AbstractProvider implements ProviderDefinitionInterfa
             'message_id' => $payload['MessageSid'] ?? $payload['SmsSid'] ?? null,
             'status' => $this->mapWebhookStatus($payload['MessageStatus'] ?? $payload['SmsStatus'] ?? ''),
             'provider_response' => $payload,
-            'delivered_at' => isset($payload['DateSent']) ? new \DateTime($payload['DateSent']) : null,
+            'delivered_at' => isset($payload['DateSent']) ? new DateTime($payload['DateSent']) : null,
             'error_code' => $payload['ErrorCode'] ?? null,
             'error_message' => $payload['ErrorMessage'] ?? null,
         ];
@@ -145,7 +147,7 @@ class TwilioDriver extends AbstractProvider implements ProviderDefinitionInterfa
             ]);
 
             return isset($response['sid']);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }

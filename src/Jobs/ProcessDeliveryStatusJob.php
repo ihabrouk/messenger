@@ -2,6 +2,8 @@
 
 namespace Ihabrouk\Messenger\Jobs;
 
+use Exception;
+use Throwable;
 use Ihabrouk\Messenger\Models\Webhook;
 use Ihabrouk\Messenger\Services\DeliveryTrackingService;
 use Illuminate\Bus\Queueable;
@@ -66,7 +68,7 @@ class ProcessDeliveryStatusJob implements ShouldQueue
                 'result' => $result,
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $webhook->update([
                 'processed' => false,
                 'error' => $e->getMessage(),
@@ -81,7 +83,7 @@ class ProcessDeliveryStatusJob implements ShouldQueue
         }
     }
 
-    public function failed(\Throwable $exception): void
+    public function failed(Throwable $exception): void
     {
         $webhook = Webhook::find($this->webhookId);
 

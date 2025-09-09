@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Contracts;
 
+use DateTimeInterface;
 use Ihabrouk\Messenger\Data\SendMessageData;
 use Ihabrouk\Messenger\Data\BulkMessageData;
 use Ihabrouk\Messenger\Data\MessageResponse;
@@ -22,7 +23,7 @@ interface MessengerServiceInterface
     /**
      * Queue single message for background processing
      */
-    public function queue(SendMessageData $data, ?\DateTimeInterface $delay = null): string;
+    public function queue(SendMessageData $data, ?DateTimeInterface $delay = null): string;
 
     /**
      * Send bulk messages
@@ -32,7 +33,7 @@ interface MessengerServiceInterface
     /**
      * Schedule message for future delivery
      */
-    public function schedule(SendMessageData $data, \DateTimeInterface $scheduledAt): string;
+    public function schedule(SendMessageData $data, DateTimeInterface $scheduledAt): string;
 
     /**
      * Send message using template

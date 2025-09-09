@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
 use Ihabrouk\Messenger\Models\MessageTemplate;
 use Ihabrouk\Messenger\Enums\TemplateCategory;
@@ -80,7 +81,7 @@ class MakeTemplateCommand extends Command
             );
 
             return 0;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Failed to create template: {$e->getMessage()}");
             return 1;
         }

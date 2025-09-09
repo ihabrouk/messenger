@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Models;
 
+use Ihabrouk\Messenger\Database\Factories\TemplateFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -282,6 +283,6 @@ class Template extends Model
      */
     protected static function newFactory()
     {
-        return \Ihabrouk\Messenger\Database\Factories\TemplateFactory::new();
+        return TemplateFactory::new();
     }
 }

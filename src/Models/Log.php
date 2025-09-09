@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Models;
 
+use Ihabrouk\Messenger\Database\Factories\LogFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -303,6 +304,6 @@ class Log extends Model
      */
     protected static function newFactory()
     {
-        return \Ihabrouk\Messenger\Database\Factories\LogFactory::new();
+        return LogFactory::new();
     }
 }

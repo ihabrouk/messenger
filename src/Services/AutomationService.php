@@ -2,6 +2,8 @@
 
 namespace Ihabrouk\Messenger\Services;
 
+use Exception;
+use DateInterval;
 use Ihabrouk\Messenger\Models\Message;
 use Ihabrouk\Messenger\Models\BulkMessage;
 use Ihabrouk\Messenger\Jobs\SendBulkMessageJob;
@@ -46,7 +48,7 @@ class AutomationService
                 $processed++;
 
                 Log::info('Scheduled message queued for processing', ['message_id' => $message->id]);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('Failed to queue scheduled message', [
                     'message_id' => $message->id,
                     'error' => $e->getMessage()
@@ -82,7 +84,7 @@ class AutomationService
                 $processed++;
 
                 Log::info('Bulk campaign queued for processing', ['campaign_id' => $campaign->id]);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('Failed to queue bulk campaign', [
                     'campaign_id' => $campaign->id,
                     'error' => $e->getMessage()
@@ -126,7 +128,7 @@ class AutomationService
                         'retry_count' => $message->retry_count + 1,
                         'delay_minutes' => $delay->totalMinutes
                     ]);
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     Log::error('Failed to queue message retry', [
                         'message_id' => $message->id,
                         'error' => $e->getMessage()
@@ -315,7 +317,7 @@ class AutomationService
         return false;
     }
 
-    protected function calculateRetryDelay(Message $message): \DateInterval
+    protected function calculateRetryDelay(Message $message): DateInterval
     {
         // Exponential backoff: 2^retry_count minutes
         $minutes = pow(2, $message->retry_count) * 5; // 5, 10, 20, 40 minutes
@@ -323,7 +325,7 @@ class AutomationService
         // Cap at 2 hours
         $minutes = min($minutes, 120);
 
-        return \DateInterval::createFromDateString("{$minutes} minutes");
+        return DateInterval::createFromDateString("{$minutes} minutes");
     }
 
     protected function isProviderHealthy(string $provider): bool
@@ -388,7 +390,7 @@ class AutomationService
             $results['alerts'] = $this->generateHealthAlerts();
 
             Log::info('Automation tasks completed', $results);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Automation task failed', ['error' => $e->getMessage()]);
             $results['error'] = $e->getMessage();
         }

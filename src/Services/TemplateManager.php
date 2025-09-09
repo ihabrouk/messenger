@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Services;
 
+use InvalidArgumentException;
 use Ihabrouk\Messenger\Models\Template;
 use Ihabrouk\Messenger\Services\TemplateService;
 use Illuminate\Support\Collection;
@@ -76,7 +77,7 @@ class TemplateManager
         $patterns = $this->getTemplatePatterns();
 
         if (!isset($patterns[$pattern])) {
-            throw new \InvalidArgumentException("Unknown template pattern: {$pattern}");
+            throw new InvalidArgumentException("Unknown template pattern: {$pattern}");
         }
 
         $patternData = $patterns[$pattern];

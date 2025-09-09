@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Commands;
 
+use Exception;
 use Ihabrouk\Messenger\Data\SendMessageData;
 use Ihabrouk\Messenger\Enums\MessageType;
 use Ihabrouk\Messenger\Services\MessageProviderFactory;
@@ -35,7 +36,7 @@ class ProcessWebhookCommand extends Command
 
             return $isValid ? Command::SUCCESS : Command::FAILURE;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Error processing webhook: " . $e->getMessage());
             return Command::FAILURE;
         }

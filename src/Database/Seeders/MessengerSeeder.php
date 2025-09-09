@@ -2,6 +2,9 @@
 
 namespace Ihabrouk\Messenger\Database\Seeders;
 
+use Ihabrouk\Messenger\Models\Template;
+use Ihabrouk\Messenger\Models\Contact;
+use Ihabrouk\Messenger\Models\Message;
 use Illuminate\Database\Seeder;
 
 /**
@@ -34,9 +37,9 @@ class MessengerSeeder extends Seeder
      */
     private function printSummary(): void
     {
-        $templateCount = \Ihabrouk\Messenger\Models\Template::count();
-        $contactCount = \Ihabrouk\Messenger\Models\Contact::count();
-        $messageCount = \Ihabrouk\Messenger\Models\Message::count();
+        $templateCount = Template::count();
+        $contactCount = Contact::count();
+        $messageCount = Message::count();
 
         $this->command->info('');
         $this->command->info('=== Messenger Seeding Summary ===');
@@ -46,10 +49,10 @@ class MessengerSeeder extends Seeder
         $this->command->info('');
 
         // Show some statistics
-        $activeContacts = \Ihabrouk\Messenger\Models\Contact::active()->count();
-        $verifiedContacts = \Ihabrouk\Messenger\Models\Contact::verified()->count();
-        $deliveredMessages = \Ihabrouk\Messenger\Models\Message::where('status', 'delivered')->count();
-        $failedMessages = \Ihabrouk\Messenger\Models\Message::where('status', 'failed')->count();
+        $activeContacts = Contact::active()->count();
+        $verifiedContacts = Contact::verified()->count();
+        $deliveredMessages = Message::where('status', 'delivered')->count();
+        $failedMessages = Message::where('status', 'failed')->count();
 
         $this->command->info('=== Statistics ===');
         $this->command->info("Active contacts: {$activeContacts}");

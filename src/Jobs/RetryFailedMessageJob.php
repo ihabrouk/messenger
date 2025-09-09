@@ -2,6 +2,8 @@
 
 namespace Ihabrouk\Messenger\Jobs;
 
+use Exception;
+use Throwable;
 use Ihabrouk\Messenger\Models\Message;
 use Ihabrouk\Messenger\Services\MessengerService;
 use Ihabrouk\Messenger\Enums\MessageStatus;
@@ -75,7 +77,7 @@ class RetryFailedMessageJob implements ShouldQueue
                 'status' => $response->status->value,
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('RetryFailedMessageJob: Retry failed', [
                 'message_id' => $this->messageId,
                 'error' => $e->getMessage(),
@@ -89,7 +91,7 @@ class RetryFailedMessageJob implements ShouldQueue
         }
     }
 
-    public function failed(\Throwable $exception): void
+    public function failed(Throwable $exception): void
     {
         $message = Message::find($this->messageId);
 

@@ -2,12 +2,24 @@
 
 namespace Ihabrouk\Messenger\Actions;
 
+use Filament\Actions\BulkAction;
+use Filament\Schemas\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Select;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\DateTimePicker;
+use Exception;
+use Filament\Actions\Action;
 use Ihabrouk\Messenger\Services\MessengerService;
 use Ihabrouk\Messenger\Services\BulkMessageService;
 use Ihabrouk\Messenger\Models\Template;
 use Ihabrouk\Messenger\Models\Batch;
 use Ihabrouk\Messenger\Enums\MessageType;
-use Filament\Tables\Actions\BulkAction;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Collection;
@@ -40,24 +52,24 @@ class BulkMessageAction extends BulkAction
             ->modalWidth('3xl');
 
         $this->form([
-            Forms\Components\Section::make('Campaign Information')
+            Section::make('Campaign Information')
                 ->schema([
-                    Forms\Components\TextInput::make('campaign_name')
+                    TextInput::make('campaign_name')
                         ->label('Campaign Name')
                         ->required()
                         ->maxLength(255)
                         ->default(fn () => 'Campaign ' . now()->format('Y-m-d H:i'))
                         ->helperText('Name for this bulk message campaign'),
 
-                    Forms\Components\Placeholder::make('recipient_count')
+                    Placeholder::make('recipient_count')
                         ->label('Recipients')
                         ->content('Will be calculated from selection'),
                 ])
                 ->columns(2),
 
-            Forms\Components\Section::make('Message Configuration')
+            Section::make('Message Configuration')
                 ->schema([
-                    Forms\Components\Select::make('provider')
+                    Select::make('provider')
                         ->label('Provider')
                         ->options([
                             'smsmisr' => 'SMS Misr (SMS)',
@@ -67,15 +79,15 @@ class BulkMessageAction extends BulkAction
                         ->default('smsmisr')
                         ->required()
                         ->live()
-                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                        ->afterStateUpdated(function ($state, Set $set) {
                             if ($state === 'smsmisr') {
                                 $set('channel', 'sms');
                             }
                         }),
 
-                    Forms\Components\Select::make('channel')
+                    Select::make('channel')
                         ->label('Channel')
-                        ->options(function (Forms\Get $get) {
+                        ->options(function (Get $get) {
                             $provider = $get('provider');
                             return match($provider) {
                                 'smsmisr' => ['sms' => 'SMS'],
@@ -90,7 +102,7 @@ class BulkMessageAction extends BulkAction
                         ->required()
                         ->live(),
 
-                    Forms\Components\Select::make('message_type')
+                    Select::make('message_type')
                         ->label('Message Type')
                         ->options([
                             'transactional' => 'Transactional',
@@ -102,22 +114,22 @@ class BulkMessageAction extends BulkAction
                 ])
                 ->columns(3),
 
-            Forms\Components\Section::make('Message Content')
+            Section::make('Message Content')
                 ->schema([
-                    Forms\Components\Toggle::make('use_template')
+                    Toggle::make('use_template')
                         ->label('Use Template')
                         ->default(true)
                         ->live()
-                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                        ->afterStateUpdated(function ($state, Set $set) {
                             if (!$state) {
                                 $set('template_id', null);
                                 $set('variables', []);
                             }
                         }),
 
-                    Forms\Components\Select::make('template_id')
+                    Select::make('template_id')
                         ->label('Template')
-                        ->options(function (Forms\Get $get) {
+                        ->options(function (Get $get) {
                             $channel = $get('channel') ?? 'sms';
                             return Template::where('is_active', true)
                                 ->where('approval_status', 'approved')
@@ -126,10 +138,10 @@ class BulkMessageAction extends BulkAction
                                 ->pluck('display_name', 'id');
                         })
                         ->searchable()
-                        ->required(fn (Forms\Get $get) => $get('use_template'))
+                        ->required(fn (Get $get) => $get('use_template'))
                         ->live()
-                        ->visible(fn (Forms\Get $get) => $get('use_template'))
-                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                        ->visible(fn (Get $get) => $get('use_template'))
+                        ->afterStateUpdated(function ($state, Set $set) {
                             if ($state) {
                                 $template = Template::find($state);
                                 if ($template) {
@@ -143,12 +155,12 @@ class BulkMessageAction extends BulkAction
                             }
                         }),
 
-                    Forms\Components\KeyValue::make('variables')
+                    KeyValue::make('variables')
                         ->label('Template Variables')
                         ->helperText('Default values for template variables. Individual records may have different values.')
-                        ->visible(fn (Forms\Get $get) => $get('use_template') && $get('template_id'))
+                        ->visible(fn (Get $get) => $get('use_template') && $get('template_id'))
                         ->live()
-                        ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
+                        ->afterStateUpdated(function ($state, Set $set, Get $get) {
                             $templateId = $get('template_id');
                             if ($templateId && $state) {
                                 $template = Template::find($templateId);
@@ -162,46 +174,46 @@ class BulkMessageAction extends BulkAction
                             }
                         }),
 
-                    Forms\Components\Textarea::make('custom_message')
+                    Textarea::make('custom_message')
                         ->label('Custom Message')
                         ->rows(4)
                         ->maxLength(1600)
-                        ->required(fn (Forms\Get $get) => !$get('use_template'))
-                        ->visible(fn (Forms\Get $get) => !$get('use_template'))
+                        ->required(fn (Get $get) => !$get('use_template'))
+                        ->visible(fn (Get $get) => !$get('use_template'))
                         ->live(debounce: 500)
-                        ->afterStateUpdated(function ($state, Forms\Set $set) {
+                        ->afterStateUpdated(function ($state, Set $set) {
                             $set('character_count', mb_strlen($state ?? ''));
                         }),
 
-                    Forms\Components\Placeholder::make('template_preview')
+                    Placeholder::make('template_preview')
                         ->label('Message Preview')
-                        ->content(fn (Forms\Get $get) => $get('template_preview') ?? 'Template preview will appear here...')
-                        ->visible(fn (Forms\Get $get) => $get('use_template')),
+                        ->content(fn (Get $get) => $get('template_preview') ?? 'Template preview will appear here...')
+                        ->visible(fn (Get $get) => $get('use_template')),
 
-                    Forms\Components\TextInput::make('character_count')
+                    TextInput::make('character_count')
                         ->label('Character Count')
                         ->disabled()
                         ->dehydrated(false)
-                        ->visible(fn (Forms\Get $get) => !$get('use_template'))
+                        ->visible(fn (Get $get) => !$get('use_template'))
                         ->helperText('SMS: 160 chars per part, WhatsApp: 4096 chars max'),
                 ])
                 ->columns(1),
 
-            Forms\Components\Section::make('Scheduling & Delivery')
+            Section::make('Scheduling & Delivery')
                 ->schema([
-                    Forms\Components\Toggle::make('schedule_message')
+                    Toggle::make('schedule_message')
                         ->label('Schedule Message')
                         ->default(false)
                         ->live(),
 
-                    Forms\Components\DateTimePicker::make('scheduled_at')
+                    DateTimePicker::make('scheduled_at')
                         ->label('Send At')
-                        ->required(fn (Forms\Get $get) => $get('schedule_message'))
-                        ->visible(fn (Forms\Get $get) => $get('schedule_message'))
+                        ->required(fn (Get $get) => $get('schedule_message'))
+                        ->visible(fn (Get $get) => $get('schedule_message'))
                         ->minDate(now())
                         ->helperText('When to send the message'),
 
-                    Forms\Components\Select::make('chunk_size')
+                    Select::make('chunk_size')
                         ->label('Batch Size')
                         ->options([
                             50 => '50 messages per batch',
@@ -212,7 +224,7 @@ class BulkMessageAction extends BulkAction
                         ->default(100)
                         ->helperText('Number of messages to send in each batch'),
 
-                    Forms\Components\TextInput::make('delay_between_batches')
+                    TextInput::make('delay_between_batches')
                         ->label('Delay Between Batches (seconds)')
                         ->numeric()
                         ->default(30)
@@ -223,13 +235,13 @@ class BulkMessageAction extends BulkAction
                 ->columns(2)
                 ->collapsible(),
 
-            Forms\Components\Section::make('Cost Estimation')
+            Section::make('Cost Estimation')
                 ->schema([
-                    Forms\Components\Placeholder::make('estimated_cost')
+                    Placeholder::make('estimated_cost')
                         ->label('Total Estimated Cost')
                         ->content('Will be calculated based on recipients'),
 
-                    Forms\Components\Placeholder::make('cost_breakdown')
+                    Placeholder::make('cost_breakdown')
                         ->label('Cost Breakdown')
                         ->content('Provider rates and message segments'),
                 ])
@@ -246,7 +258,7 @@ class BulkMessageAction extends BulkAction
             $recipientCount = $records->count();
 
             if ($recipientCount > $this->maxRecipients) {
-                throw new \Exception("Too many recipients selected. Maximum {$this->maxRecipients} allowed.");
+                throw new Exception("Too many recipients selected. Maximum {$this->maxRecipients} allowed.");
             }
 
             return [
@@ -318,7 +330,7 @@ class BulkMessageAction extends BulkAction
                     ->body("Messages scheduled for {$recipients} recipients at " . $data['scheduled_at'])
                     ->success()
                     ->actions([
-                        \Filament\Notifications\Actions\Action::make('view_batch')
+                        Action::make('view_batch')
                             ->label('View Batch')
                             ->url(route('filament.admin.resources.message-batches.view', ['record' => $batch]))
                             ->openUrlInNewTab(),
@@ -333,7 +345,7 @@ class BulkMessageAction extends BulkAction
                     ->body("Sending messages to " . count($recipients) . " recipients...")
                     ->success()
                     ->actions([
-                        \Filament\Notifications\Actions\Action::make('view_batch')
+                        Action::make('view_batch')
                             ->label('View Progress')
                             ->url(route('filament.admin.resources.message-batches.view', ['record' => $batch]))
                             ->openUrlInNewTab(),
@@ -350,7 +362,7 @@ class BulkMessageAction extends BulkAction
                     ->send();
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Bulk message action failed: ' . $e->getMessage(), [
                 'data' => $data,
                 'record_count' => $records->count(),

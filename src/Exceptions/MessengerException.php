@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Exceptions;
 
+use Throwable;
 use Exception;
 
 class MessengerException extends Exception
@@ -18,7 +19,7 @@ class MessengerException extends Exception
         ?string $provider = null,
         ?string $errorType = null,
         int $code = 0,
-        ?\Throwable $previous = null
+        ?Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);
         $this->errorCode = $errorCode;

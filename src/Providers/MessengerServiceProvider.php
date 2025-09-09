@@ -2,6 +2,42 @@
 
 namespace Ihabrouk\Messenger\Providers;
 
+use Ihabrouk\Messenger\Contracts\ProviderRegistryInterface;
+use Ihabrouk\Messenger\Services\ProviderRegistry;
+use Ihabrouk\Messenger\Services\ProviderService;
+use Ihabrouk\Messenger\Services\TemplateManager;
+use Ihabrouk\Messenger\Services\TemplateValidator;
+use Ihabrouk\Messenger\Services\DeliveryTrackingService;
+use Ihabrouk\Messenger\Services\CircuitBreakerService;
+use Ihabrouk\Messenger\Services\BulkMessageService;
+use Ihabrouk\Messenger\Services\MonitoringService;
+use Ihabrouk\Messenger\Services\AutomationService;
+use Ihabrouk\Messenger\Services\ConsentService;
+use Ihabrouk\Messenger\Services\AnalyticsService;
+use Ihabrouk\Messenger\Commands\MakeDriverCommand;
+use Ihabrouk\Messenger\Commands\MakeTemplateCommand;
+use Ihabrouk\Messenger\Commands\TestProviderCommand;
+use Ihabrouk\Messenger\Commands\ListProvidersCommand;
+use Ihabrouk\Messenger\Commands\ProcessWebhookCommand;
+use Ihabrouk\Messenger\Commands\CleanupLogsCommand;
+use Ihabrouk\Messenger\Commands\MessengerAutomationCommand;
+use Ihabrouk\Messenger\Commands\MessengerStatusCommand;
+use Ihabrouk\Messenger\Commands\DiagnoseInstallationCommand;
+use Ihabrouk\Messenger\Drivers\SmsMisrDriver;
+use Ihabrouk\Messenger\Drivers\TwilioDriver;
+use Ihabrouk\Messenger\Drivers\MockTestDriver;
+use Ihabrouk\Messenger\Commands\SendMessageCommand;
+use Ihabrouk\Messenger\Commands\ValidateTemplateCommand;
+use Ihabrouk\Messenger\Commands\PreviewTemplateCommand;
+use Ihabrouk\Messenger\Commands\ManageTemplatesCommand;
+use Ihabrouk\Messenger\Http\Controllers\SmsMisrWebhookController;
+use Ihabrouk\Messenger\Http\Controllers\TwilioWebhookController;
+use Ihabrouk\Messenger\Events\MessageSent;
+use Ihabrouk\Messenger\Listeners\LogMessageSent;
+use Ihabrouk\Messenger\Events\MessageFailed;
+use Ihabrouk\Messenger\Listeners\LogMessageFailure;
+use Ihabrouk\Messenger\Events\MessageDelivered;
+use Ihabrouk\Messenger\Listeners\LogMessageDelivered;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Ihabrouk\Messenger\Contracts\MessengerServiceInterface;
@@ -24,33 +60,33 @@ class MessengerServiceProvider extends ServiceProvider
         );
 
         // Register provider registry
-        $this->app->singleton(\Ihabrouk\Messenger\Contracts\ProviderRegistryInterface::class, \Ihabrouk\Messenger\Services\ProviderRegistry::class);
+        $this->app->singleton(ProviderRegistryInterface::class, ProviderRegistry::class);
 
         // Register core services
         $this->app->singleton(MessengerServiceInterface::class, MessengerService::class);
         $this->app->singleton(TemplateServiceInterface::class, TemplateService::class);
-        $this->app->singleton(\Ihabrouk\Messenger\Services\ProviderService::class);
+        $this->app->singleton(ProviderService::class);
 
         // Register template services
-        $this->app->singleton(\Ihabrouk\Messenger\Services\TemplateManager::class);
-        $this->app->singleton(\Ihabrouk\Messenger\Services\TemplateValidator::class);
+        $this->app->singleton(TemplateManager::class);
+        $this->app->singleton(TemplateValidator::class);
 
         // Register new Phase 6 services
-        $this->app->singleton(\Ihabrouk\Messenger\Services\DeliveryTrackingService::class);
-        $this->app->singleton(\Ihabrouk\Messenger\Services\CircuitBreakerService::class);
-        $this->app->singleton(\Ihabrouk\Messenger\Services\BulkMessageService::class);
-        $this->app->singleton(\Ihabrouk\Messenger\Services\MonitoringService::class);
-        $this->app->singleton(\Ihabrouk\Messenger\Services\AutomationService::class);
+        $this->app->singleton(DeliveryTrackingService::class);
+        $this->app->singleton(CircuitBreakerService::class);
+        $this->app->singleton(BulkMessageService::class);
+        $this->app->singleton(MonitoringService::class);
+        $this->app->singleton(AutomationService::class);
 
         // Register new Phase 7 services
-        $this->app->singleton(\Ihabrouk\Messenger\Services\ConsentService::class);
-        $this->app->singleton(\Ihabrouk\Messenger\Services\AnalyticsService::class);
+        $this->app->singleton(ConsentService::class);
+        $this->app->singleton(AnalyticsService::class);
 
         // Register factory with registry
         $this->app->singleton(MessageProviderFactory::class, function ($app) {
             return new MessageProviderFactory(
                 $app,
-                $app->make(\Ihabrouk\Messenger\Contracts\ProviderRegistryInterface::class),
+                $app->make(ProviderRegistryInterface::class),
                 config('messenger.providers', [])
             );
         });
@@ -58,15 +94,15 @@ class MessengerServiceProvider extends ServiceProvider
         // Register commands
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \Ihabrouk\Messenger\Commands\MakeDriverCommand::class,
-                \Ihabrouk\Messenger\Commands\MakeTemplateCommand::class,
-                \Ihabrouk\Messenger\Commands\TestProviderCommand::class,
-                \Ihabrouk\Messenger\Commands\ListProvidersCommand::class,
-                \Ihabrouk\Messenger\Commands\ProcessWebhookCommand::class,
-                \Ihabrouk\Messenger\Commands\CleanupLogsCommand::class,
-                \Ihabrouk\Messenger\Commands\MessengerAutomationCommand::class,
-                \Ihabrouk\Messenger\Commands\MessengerStatusCommand::class,
-                \Ihabrouk\Messenger\Commands\DiagnoseInstallationCommand::class,
+                MakeDriverCommand::class,
+                MakeTemplateCommand::class,
+                TestProviderCommand::class,
+                ListProvidersCommand::class,
+                ProcessWebhookCommand::class,
+                CleanupLogsCommand::class,
+                MessengerAutomationCommand::class,
+                MessengerStatusCommand::class,
+                DiagnoseInstallationCommand::class,
             ]);
         }
     }
@@ -114,17 +150,17 @@ class MessengerServiceProvider extends ServiceProvider
         }
 
         // Auto-discover and register providers
-        $registry = $this->app->make(\Ihabrouk\Messenger\Contracts\ProviderRegistryInterface::class);
+        $registry = $this->app->make(ProviderRegistryInterface::class);
 
         // For now, we'll manually register since we don't have service container tags set up
         // In a full package implementation, this would use tagged services
 
         // Manually register built-in providers with capabilities
-        $registry->register('smsmisr', \Ihabrouk\Messenger\Drivers\SmsMisrDriver::class, ['sms', 'otp', 'bulk_messaging']);
-        $registry->register('twilio', \Ihabrouk\Messenger\Drivers\TwilioDriver::class, ['sms', 'whatsapp', 'bulk_messaging']);
+        $registry->register('smsmisr', SmsMisrDriver::class, ['sms', 'otp', 'bulk_messaging']);
+        $registry->register('twilio', TwilioDriver::class, ['sms', 'whatsapp', 'bulk_messaging']);
 
         // Register test provider to verify plugin architecture
-        $registry->register('mocktest', \Ihabrouk\Messenger\Drivers\MockTestDriver::class, ['sms', 'bulk_messaging']);
+        $registry->register('mocktest', MockTestDriver::class, ['sms', 'bulk_messaging']);
 
         // Register routes
         $this->registerRoutes();
@@ -135,15 +171,15 @@ class MessengerServiceProvider extends ServiceProvider
         // Register console commands
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \Ihabrouk\Messenger\Commands\SendMessageCommand::class,
-                \Ihabrouk\Messenger\Commands\ValidateTemplateCommand::class,
-                \Ihabrouk\Messenger\Commands\PreviewTemplateCommand::class,
-                \Ihabrouk\Messenger\Commands\ManageTemplatesCommand::class,
-                \Ihabrouk\Messenger\Commands\TestProviderCommand::class,
-                \Ihabrouk\Messenger\Commands\ListProvidersCommand::class,
-                \Ihabrouk\Messenger\Commands\ProcessWebhookCommand::class,
-                \Ihabrouk\Messenger\Commands\CleanupLogsCommand::class,
-                \Ihabrouk\Messenger\Commands\DiagnoseInstallationCommand::class,
+                SendMessageCommand::class,
+                ValidateTemplateCommand::class,
+                PreviewTemplateCommand::class,
+                ManageTemplatesCommand::class,
+                TestProviderCommand::class,
+                ListProvidersCommand::class,
+                ProcessWebhookCommand::class,
+                CleanupLogsCommand::class,
+                DiagnoseInstallationCommand::class,
             ]);
         }
     }
@@ -157,10 +193,10 @@ class MessengerServiceProvider extends ServiceProvider
             Route::prefix('messenger/webhook')
                 ->middleware(['api'])
                 ->group(function () {
-                    Route::post('smsmisr', [\Ihabrouk\Messenger\Http\Controllers\SmsMisrWebhookController::class, 'handle'])
+                    Route::post('smsmisr', [SmsMisrWebhookController::class, 'handle'])
                         ->name('messenger.webhook.smsmisr');
 
-                    Route::post('twilio', [\Ihabrouk\Messenger\Http\Controllers\TwilioWebhookController::class, 'handle'])
+                    Route::post('twilio', [TwilioWebhookController::class, 'handle'])
                         ->name('messenger.webhook.twilio');
                 });
         }
@@ -175,18 +211,18 @@ class MessengerServiceProvider extends ServiceProvider
 
         // Message events
         $events->listen(
-            \Ihabrouk\Messenger\Events\MessageSent::class,
-            \Ihabrouk\Messenger\Listeners\LogMessageSent::class
+            MessageSent::class,
+            LogMessageSent::class
         );
 
         $events->listen(
-            \Ihabrouk\Messenger\Events\MessageFailed::class,
-            \Ihabrouk\Messenger\Listeners\LogMessageFailure::class
+            MessageFailed::class,
+            LogMessageFailure::class
         );
 
         $events->listen(
-            \Ihabrouk\Messenger\Events\MessageDelivered::class,
-            \Ihabrouk\Messenger\Listeners\LogMessageDelivered::class
+            MessageDelivered::class,
+            LogMessageDelivered::class
         );
     }
 
@@ -199,8 +235,8 @@ class MessengerServiceProvider extends ServiceProvider
             MessengerServiceInterface::class,
             TemplateServiceInterface::class,
             MessageProviderFactory::class,
-            \Ihabrouk\Messenger\Contracts\ProviderRegistryInterface::class,
-            \Ihabrouk\Messenger\Services\ProviderService::class,
+            ProviderRegistryInterface::class,
+            ProviderService::class,
         ];
     }
 }

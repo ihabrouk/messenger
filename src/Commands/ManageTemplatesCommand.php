@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Commands;
 
+use Exception;
 use Ihabrouk\Messenger\Services\TemplateService;
 use Ihabrouk\Messenger\Services\TemplateManager;
 use Ihabrouk\Messenger\Models\Template;
@@ -112,7 +113,7 @@ class ManageTemplatesCommand extends Command
 
             $this->info("Template created successfully: {$template->name} (ID: {$template->id})");
             return 0;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Failed to create template: " . $e->getMessage());
             return 1;
         }
@@ -172,7 +173,7 @@ class ManageTemplatesCommand extends Command
             $newTemplate = $templateManager->duplicateTemplate($template, $modifications);
             $this->info("Template duplicated successfully: {$newTemplate->name} (ID: {$newTemplate->id})");
             return 0;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Failed to duplicate template: " . $e->getMessage());
             return 1;
         }

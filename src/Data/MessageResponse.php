@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Data;
 
+use DateTime;
 use Ihabrouk\Messenger\Enums\MessageStatus;
 
 class MessageResponse
@@ -16,7 +17,7 @@ class MessageResponse
         public ?string $errorMessage = null,
         public array $metadata = [],
         public ?string $provider = null,
-        public ?\DateTime $sentAt = null,
+        public ?DateTime $sentAt = null,
     ) {}
 
     public function toArray(): array
@@ -50,7 +51,7 @@ class MessageResponse
             cost: $cost,
             provider: $provider,
             metadata: $metadata,
-            sentAt: new \DateTime(),
+            sentAt: new DateTime(),
         );
     }
 

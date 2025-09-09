@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Models;
 
+use Ihabrouk\Messenger\Database\Factories\BatchFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -398,6 +399,6 @@ class Batch extends Model
      */
     protected static function newFactory()
     {
-        return \Ihabrouk\Messenger\Database\Factories\BatchFactory::new();
+        return BatchFactory::new();
     }
 }

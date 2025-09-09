@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Commands;
 
+use Exception;
 use Ihabrouk\Messenger\Services\MessageProviderFactory;
 use Ihabrouk\Messenger\Testing\ProviderTestHelper;
 use Ihabrouk\Messenger\Testing\MockMessageProvider;
@@ -39,7 +40,7 @@ class TestProviderCommand extends Command
                 return $this->runBasicTest($provider, $recipient, $message);
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Error testing provider: " . $e->getMessage());
             return Command::FAILURE;
         }

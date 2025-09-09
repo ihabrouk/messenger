@@ -2,6 +2,8 @@
 
 namespace Ihabrouk\Messenger\Services;
 
+use Exception;
+use Ihabrouk\Messenger\Data\MessageResponse;
 use Ihabrouk\Messenger\Models\Batch;
 use Ihabrouk\Messenger\Models\Message;
 use Ihabrouk\Messenger\Models\Template;
@@ -71,7 +73,7 @@ class BulkMessageService
 
             return $results;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
 
             $batch->update([
@@ -121,7 +123,7 @@ class BulkMessageService
 
             return ['status' => 'scheduled', 'batch_id' => $batch->id];
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $batch->update(['status' => 'failed']);
 
             Log::error('Failed to schedule bulk message batch', [
@@ -139,7 +141,7 @@ class BulkMessageService
     public function startBatch(Batch $batch): void
     {
         if ($batch->status !== 'pending') {
-            throw new \Exception("Cannot start batch with status: {$batch->status}");
+            throw new Exception("Cannot start batch with status: {$batch->status}");
         }
 
         // For now, we'll mark it as processing
@@ -194,7 +196,7 @@ class BulkMessageService
                     $results[] = ['recipient' => $recipient['phone'], 'status' => 'failed', 'error' => $result->errorMessage];
                 }
 
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $results[] = ['recipient' => $recipient['phone'], 'status' => 'failed', 'error' => $e->getMessage()];
 
                 Log::error('Failed to send message in bulk chunk', [
@@ -292,7 +294,7 @@ class BulkMessageService
     public function cancelBatch(Batch $batch): void
     {
         if (!in_array($batch->status, ['pending', 'processing', 'scheduled'])) {
-            throw new \Exception("Cannot cancel batch with status: {$batch->status}");
+            throw new Exception("Cannot cancel batch with status: {$batch->status}");
         }
 
         DB::beginTransaction();
@@ -313,7 +315,7 @@ class BulkMessageService
 
             Log::info('Batch cancelled', ['batch_id' => $batch->id]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             throw $e;
         }
@@ -362,7 +364,7 @@ class BulkMessageService
                     $results[] = ['message_id' => $message->id, 'status' => 'retry_failed', 'error' => $result->errorMessage];
                 }
 
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $results[] = ['message_id' => $message->id, 'status' => 'retry_failed', 'error' => $e->getMessage()];
             }
         }
@@ -387,7 +389,7 @@ class BulkMessageService
     /**
      * Send a message using the appropriate provider
      */
-    protected function sendMessage(SendMessageData $data): \Ihabrouk\Messenger\Data\MessageResponse
+    protected function sendMessage(SendMessageData $data): MessageResponse
     {
         $provider = $this->providerFactory->make($data->provider);
         

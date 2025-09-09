@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Http\Controllers;
 
+use Exception;
 use App\Http\Controllers\Controller;
 use Ihabrouk\Messenger\Services\MessageProviderFactory;
 use Illuminate\Http\Request;
@@ -59,7 +60,7 @@ class TwilioWebhookController extends Controller
             return response('<?xml version="1.0" encoding="UTF-8"?><Response></Response>', 200)
                 ->header('Content-Type', 'text/xml');
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Twilio webhook processing failed', [
                 'error' => $e->getMessage(),
                 'payload' => $request->all(),

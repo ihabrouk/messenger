@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Http\Controllers;
 
+use Exception;
 use App\Http\Controllers\Controller;
 use Ihabrouk\Messenger\Services\MessageProviderFactory;
 use Illuminate\Http\Request;
@@ -64,7 +65,7 @@ class SmsMisrWebhookController extends Controller
 
             return response('OK', 200);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('SMS Misr webhook processing failed', [
                 'error' => $e->getMessage(),
                 'payload' => $request->all(),

@@ -2,6 +2,8 @@
 
 namespace Ihabrouk\Messenger\Drivers;
 
+use Exception;
+use DateTime;
 use Ihabrouk\Messenger\Contracts\ProviderDefinitionInterface;
 use Ihabrouk\Messenger\Data\SendMessageData;
 use Ihabrouk\Messenger\Data\MessageResponse;
@@ -133,7 +135,7 @@ class SmsMisrDriver extends AbstractProvider implements ProviderDefinitionInterf
             ]);
 
             return (float) ($response['Balance'] ?? 0.0);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logActivity('Balance check failed', ['error' => $e->getMessage()]);
             return 0.0;
         }
@@ -161,7 +163,7 @@ class SmsMisrDriver extends AbstractProvider implements ProviderDefinitionInterf
             'message_id' => $payload['SMSID'] ?? null,
             'status' => $this->mapWebhookStatus($payload['Status'] ?? ''),
             'provider_response' => $payload,
-            'delivered_at' => isset($payload['DeliveredAt']) ? new \DateTime($payload['DeliveredAt']) : null,
+            'delivered_at' => isset($payload['DeliveredAt']) ? new DateTime($payload['DeliveredAt']) : null,
         ];
     }
 
@@ -181,7 +183,7 @@ class SmsMisrDriver extends AbstractProvider implements ProviderDefinitionInterf
         try {
             $this->getBalance();
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }

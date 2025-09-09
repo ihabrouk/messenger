@@ -2,6 +2,8 @@
 
 namespace Ihabrouk\Messenger\Commands;
 
+use Schema;
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -57,14 +59,14 @@ class DiagnoseInstallationCommand extends Command
             ];
 
             foreach ($tables as $table => $model) {
-                if (\Schema::hasTable($table)) {
+                if (Schema::hasTable($table)) {
                     $this->info("   ✅ Table '{$table}' exists");
                 } else {
                     $this->error("   ❌ Table '{$table}' missing - migrations not run");
                     $issues++;
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("   ❌ Database connection error: " . $e->getMessage());
             $issues++;
         }

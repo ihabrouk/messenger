@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Models;
 
+use Ihabrouk\Messenger\Database\Factories\ContactFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -568,6 +569,6 @@ class Contact extends Model
      */
     protected static function newFactory()
     {
-        return \Ihabrouk\Messenger\Database\Factories\ContactFactory::new();
+        return ContactFactory::new();
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Ihabrouk\Messenger\Commands;
 
+use JsonException;
+use Exception;
 use Ihabrouk\Messenger\Services\MessengerService;
 use Ihabrouk\Messenger\Models\Template;
 use Illuminate\Console\Command;
@@ -39,7 +41,7 @@ class SendMessageCommand extends Command
         if ($varsJson) {
             try {
                 $variables = json_decode($varsJson, true, 512, JSON_THROW_ON_ERROR);
-            } catch (\JsonException $e) {
+            } catch (JsonException $e) {
                 $this->error("Invalid JSON in --vars option: " . $e->getMessage());
                 return 1;
             }
@@ -62,7 +64,7 @@ class SendMessageCommand extends Command
             } else {
                 return $this->sendDirectMessage($messenger, $phone, $message, $provider, $type);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error('Failed to send message: ' . $e->getMessage());
             return 1;
         }
@@ -207,7 +209,7 @@ class SendMessageCommand extends Command
                 } else {
                     $failCount++;
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->error("Failed to send to {$phone}: " . $e->getMessage());
                 $failCount++;
             }

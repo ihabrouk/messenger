@@ -2,6 +2,9 @@
 
 namespace Ihabrouk\Messenger\Models;
 
+use Exception;
+use Carbon\Carbon;
+use Ihabrouk\Messenger\Database\Factories\WebhookFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -366,7 +369,7 @@ class Webhook extends Model
 
             $this->markAsProcessed();
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->markAsFailed($e->getMessage());
         }
     }
@@ -394,7 +397,7 @@ class Webhook extends Model
             'message_id' => $payload['messageId'] ?? null,
             'status' => $payload['status'] ?? null,
             'delivered_at' => isset($payload['deliveredAt']) ?
-                \Carbon\Carbon::parse($payload['deliveredAt']) : null,
+                Carbon::parse($payload['deliveredAt']) : null,
         ];
     }
 
@@ -449,6 +452,6 @@ class Webhook extends Model
      */
     protected static function newFactory()
     {
-        return \Ihabrouk\Messenger\Database\Factories\WebhookFactory::new();
+        return WebhookFactory::new();
     }
 }

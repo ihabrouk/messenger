@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Commands;
 
+use Exception;
 use Ihabrouk\Messenger\Services\AutomationService;
 use Illuminate\Console\Command;
 
@@ -92,7 +93,7 @@ class MessengerAutomationCommand extends Command
             $this->info("Task completed successfully");
             return 0;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Task failed: " . $e->getMessage());
             return 1;
         }
@@ -122,7 +123,7 @@ class MessengerAutomationCommand extends Command
 
             return 0;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Automation failed: " . $e->getMessage());
             return 1;
         }

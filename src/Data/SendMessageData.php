@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Data;
 
+use DateTime;
 use Ihabrouk\Messenger\Enums\MessageType;
 use Ihabrouk\Messenger\Enums\MessageLanguage;
 use Ihabrouk\Messenger\Enums\MessagePriority;
@@ -18,7 +19,7 @@ class SendMessageData
         public array $variables = [],
         public ?string $templateKey = null,
         public ?int $templateId = null,
-        public ?\DateTime $scheduledAt = null,
+        public ?DateTime $scheduledAt = null,
         public ?string $reference = null,
         public array $metadata = [],
         public ?string $from = null,
@@ -59,7 +60,7 @@ class SendMessageData
             variables: $data['variables'] ?? [],
             templateKey: $data['template_key'] ?? null,
             templateId: $data['template_id'] ?? null,
-            scheduledAt: isset($data['scheduled_at']) ? new \DateTime($data['scheduled_at']) : null,
+            scheduledAt: isset($data['scheduled_at']) ? new DateTime($data['scheduled_at']) : null,
             reference: $data['reference'] ?? null,
             metadata: $data['metadata'] ?? [],
             from: $data['from'] ?? null,

@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Commands;
 
+use Exception;
 use Ihabrouk\Messenger\Services\MonitoringService;
 use Illuminate\Console\Command;
 
@@ -35,7 +36,7 @@ class MessengerStatusCommand extends Command
 
             return $this->showSystemHealth();
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("Failed to get status: " . $e->getMessage());
             return 1;
         }

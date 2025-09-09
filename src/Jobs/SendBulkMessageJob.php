@@ -2,6 +2,8 @@
 
 namespace Ihabrouk\Messenger\Jobs;
 
+use Exception;
+use Throwable;
 use Ihabrouk\Messenger\Models\Batch;
 use Ihabrouk\Messenger\Services\BulkMessageService;
 use Illuminate\Bus\Queueable;
@@ -51,7 +53,7 @@ class SendBulkMessageJob implements ShouldQueue
                 'sent_count' => $batch->fresh()->sent_count,
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('SendBulkMessageJob: Batch processing failed', [
                 'batch_id' => $this->batchId,
                 'error' => $e->getMessage(),
@@ -67,7 +69,7 @@ class SendBulkMessageJob implements ShouldQueue
         }
     }
 
-    public function failed(\Throwable $exception): void
+    public function failed(Throwable $exception): void
     {
         $batch = Batch::find($this->batchId);
 

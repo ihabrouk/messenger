@@ -2,6 +2,8 @@
 
 namespace Ihabrouk\Messenger\Services;
 
+use Exception;
+use InvalidArgumentException;
 use Ihabrouk\Messenger\Models\Consent;
 use Ihabrouk\Messenger\Models\Message;
 use Ihabrouk\Messenger\Enums\ConsentStatus;
@@ -483,7 +485,7 @@ class ConsentService
             try {
                 $consent = $this->optIn($phone, $channel, $consentType, 'bulk_operation');
                 $results[] = ['phone' => $phone, 'status' => 'success', 'consent_id' => $consent->id];
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $results[] = ['phone' => $phone, 'status' => 'failed', 'error' => $e->getMessage()];
             }
         }
@@ -545,11 +547,11 @@ class ConsentService
     private function validatePhoneNumber(string $phoneNumber): void
     {
         if (empty(trim($phoneNumber))) {
-            throw new \InvalidArgumentException('Phone number cannot be empty');
+            throw new InvalidArgumentException('Phone number cannot be empty');
         }
 
         if (!preg_match('/^\+\d{10,15}$/', $phoneNumber)) {
-            throw new \InvalidArgumentException('Invalid phone number format. Must start with + and contain 10-15 digits');
+            throw new InvalidArgumentException('Invalid phone number format. Must start with + and contain 10-15 digits');
         }
     }
 }

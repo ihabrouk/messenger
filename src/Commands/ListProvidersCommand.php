@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
 use Ihabrouk\Messenger\Contracts\ProviderRegistryInterface;
 use Ihabrouk\Messenger\Services\ProviderService;
@@ -52,7 +53,7 @@ class ListProvidersCommand extends Command
                     $this->line("   Capabilities: " . implode(', ', $capabilities));
                     $this->line("   Display Name: " . ($definition->displayName ?? ucfirst($name)));
                     $this->line("   Description: " . ($definition->description ?? 'No description'));
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $this->line("   <error>Error reading definition: {$e->getMessage()}</error>");
                 }
             } else {

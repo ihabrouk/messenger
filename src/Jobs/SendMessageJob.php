@@ -2,6 +2,9 @@
 
 namespace Ihabrouk\Messenger\Jobs;
 
+use Exception;
+use Throwable;
+use DateTime;
 use Ihabrouk\Messenger\Models\Message;
 use Ihabrouk\Messenger\Services\MessengerService;
 use Ihabrouk\Messenger\Services\MessageProviderFactory;
@@ -89,13 +92,13 @@ class SendMessageJob implements ShouldQueue
                 'cost' => $response->cost,
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->handleFailure($message, $e);
             throw $e; // Re-throw to trigger retry mechanism
         }
     }
 
-    public function failed(\Throwable $exception): void
+    public function failed(Throwable $exception): void
     {
         $message = Message::find($this->messageId);
 
@@ -115,7 +118,7 @@ class SendMessageJob implements ShouldQueue
         }
     }
 
-    protected function handleFailure(Message $message, \Exception $exception): void
+    protected function handleFailure(Message $message, Exception $exception): void
     {
         $retryCount = $this->attempts();
 
@@ -156,7 +159,7 @@ class SendMessageJob implements ShouldQueue
     /**
      * Determine if the job should be retried based on exception
      */
-    public function retryUntil(): \DateTime
+    public function retryUntil(): DateTime
     {
         return now()->addMinutes(10);
     }

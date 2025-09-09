@@ -2,6 +2,8 @@
 
 namespace Ihabrouk\Messenger\Services;
 
+use Exception;
+use DateTimeInterface;
 use Ihabrouk\Messenger\Contracts\MessengerServiceInterface;
 use Ihabrouk\Messenger\Data\SendMessageData;
 use Ihabrouk\Messenger\Data\BulkMessageData;
@@ -77,7 +79,7 @@ class MessengerService implements MessengerServiceInterface
 
             return $response;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Record failure in circuit breaker
             $this->circuitBreaker->recordFailure($data->provider);
 
@@ -103,7 +105,7 @@ class MessengerService implements MessengerServiceInterface
     /**
      * Queue single message for background processing
      */
-    public function queue(SendMessageData $data, ?\DateTimeInterface $delay = null): string
+    public function queue(SendMessageData $data, ?DateTimeInterface $delay = null): string
     {
         Log::info('MessengerService: Queuing message', [
             'recipient' => $data->to,
@@ -149,7 +151,7 @@ class MessengerService implements MessengerServiceInterface
     /**
      * Schedule message for future delivery
      */
-    public function schedule(SendMessageData $data, \DateTimeInterface $scheduledAt): string
+    public function schedule(SendMessageData $data, DateTimeInterface $scheduledAt): string
     {
         Log::info('MessengerService: Scheduling message', [
             'recipient' => $data->to,

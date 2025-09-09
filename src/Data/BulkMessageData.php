@@ -2,6 +2,8 @@
 
 namespace Ihabrouk\Messenger\Data;
 
+use DateTime;
+
 class BulkMessageData
 {
     public function __construct(
@@ -11,7 +13,7 @@ class BulkMessageData
         public array $variables = [],
         public ?string $provider = null,
         public ?string $channel = null,
-        public ?\DateTime $scheduledAt = null,
+        public ?DateTime $scheduledAt = null,
         public ?string $campaignName = null,
         public array $metadata = [],
     ) {}

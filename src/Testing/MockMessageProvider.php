@@ -2,6 +2,7 @@
 
 namespace Ihabrouk\Messenger\Testing;
 
+use Exception;
 use Ihabrouk\Messenger\Contracts\MessageProviderInterface;
 use Ihabrouk\Messenger\Data\MessageResponse;
 use Ihabrouk\Messenger\Data\SendMessageData;
@@ -23,7 +24,7 @@ class MockMessageProvider implements MessageProviderInterface
     public function send(SendMessageData $messageData): MessageResponse
     {
         if ($this->shouldFail) {
-            throw new \Exception('Mock provider failure');
+            throw new Exception('Mock provider failure');
         }
 
         return new MessageResponse(
@@ -39,7 +40,7 @@ class MockMessageProvider implements MessageProviderInterface
     public function sendBulk(array $messages): array
     {
         if ($this->shouldFail) {
-            throw new \Exception('Mock provider bulk failure');
+            throw new Exception('Mock provider bulk failure');
         }
 
         return collect($messages)->map(function ($messageData) {
