@@ -170,8 +170,8 @@ use Ihabrouk\Messenger\Actions\SendMessageAction;
 
 // In your table actions
 SendMessageAction::make()
-    ->phoneColumn('phone_number')
-    ->nameColumn('full_name')
+    ->phoneField('phone_number')
+    ->nameField('full_name')
 ```
 
 ## Provider Configuration
