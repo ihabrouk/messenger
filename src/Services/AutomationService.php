@@ -5,7 +5,7 @@ namespace Ihabrouk\Messenger\Services;
 use Exception;
 use DateInterval;
 use Ihabrouk\Messenger\Models\Message;
-use Ihabrouk\Messenger\Models\BulkMessage;
+use Ihabrouk\Messenger\Models\Batch;
 use Ihabrouk\Messenger\Jobs\SendBulkMessageJob;
 use Ihabrouk\Messenger\Jobs\ProcessScheduledMessageJob;
 use Ihabrouk\Messenger\Jobs\RetryFailedMessageJob;
@@ -32,8 +32,9 @@ class AutomationService
      */
     public function processScheduledMessages(): int
     {
-        $dueMessages = Message::where('status', MessageStatus::SCHEDULED)
+        $dueMessages = Message::where('status', MessageStatus::PENDING)
             ->where('scheduled_at', '<=', Carbon::now())
+            ->whereNotNull('scheduled_at')
             ->limit(100)
             ->get();
 
@@ -44,7 +45,7 @@ class AutomationService
                 ProcessScheduledMessageJob::dispatch($message->id)
                     ->onQueue('messages');
 
-                $message->update(['status' => MessageStatus::PENDING]);
+                $message->update(['status' => MessageStatus::QUEUED]);
                 $processed++;
 
                 Log::info('Scheduled message queued for processing', ['message_id' => $message->id]);
@@ -68,7 +69,7 @@ class AutomationService
      */
     public function processBulkCampaigns(): int
     {
-        $pendingCampaigns = BulkMessage::where('status', 'pending')
+        $pendingCampaigns = Batch::where('status', 'pending')
             ->where('scheduled_at', '<=', Carbon::now())
             ->limit(10)
             ->get();
@@ -126,7 +127,7 @@ class AutomationService
                     Log::info('Failed message queued for retry', [
                         'message_id' => $message->id,
                         'retry_count' => $message->retry_count + 1,
-                        'delay_minutes' => $delay->totalMinutes
+                        'delay_minutes' => ($delay->h * 60) + $delay->i
                     ]);
                 } catch (Exception $e) {
                     Log::error('Failed to queue message retry', [
@@ -190,10 +191,11 @@ class AutomationService
 
                     Log::info('Circuit breaker healed', ['provider' => $provider]);
                 }
-            } elseif ($state === 'open') {
-                // Try to transition to half-open if timeout has passed
-                if ($this->circuitBreakerService->canAttemptReset($provider)) {
-                    $this->circuitBreakerService->attemptReset($provider);
+            } elseif ($state['status'] === 'open') {
+                // Check if provider has been down long enough to attempt reset
+                $lastFailure = $this->circuitBreakerService->getLastFailureTime($provider);
+                if ($lastFailure && $lastFailure->diffInMinutes(now()) >= 60) {
+                    $this->circuitBreakerService->reset($provider);
 
                     Log::info('Circuit breaker reset attempted', ['provider' => $provider]);
                 }
@@ -208,7 +210,8 @@ class AutomationService
      */
     public function balanceProviderLoad(): array
     {
-        $health = $this->monitoringService->getProviderHealth();
+        $systemHealth = $this->monitoringService->getSystemHealth();
+        $health = $systemHealth['providers'] ?? [];
         $recommendations = [];
 
         foreach ($health as $provider => $stats) {
