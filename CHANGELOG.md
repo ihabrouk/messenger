@@ -10,7 +10,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **v2.x**: Laravel 11+ with Filament v4+ (main branch)
 - **v1.x**: Laravel 10/11 with Filament v3 (v1.x branch)
 
-## [2.0.0] - 2025-09-09
+## [2.0.2] - 2025-09-09
+
+### Fixed
+- **BREAKING FIX:** Corrected method names in documentation and examples
+  - `phoneColumn()` → `phoneField()` in SendMessageAction
+  - `nameColumn()` → `nameField()` in SendMessageAction  
+  - `phoneColumn()` → `phoneField()` in BulkMessageAction
+  - `nameColumn()` → `nameField()` in BulkMessageAction
+- Updated README.md with correct method names
+- Fixed examples in MemberResourceExample.php
+
+### Migration Note
+If you were using the incorrect method names from our documentation, update your code:
+```php
+// OLD (incorrect)
+SendMessageAction::make()
+    ->phoneColumn('phone')
+    ->nameColumn('name')
+
+// NEW (correct)  
+SendMessageAction::make()
+    ->phoneField('phone')
+    ->nameField('name')
+```
+
+## [2.0.1] - 2025-09-09
 
 ### Added
 - Support for Laravel 12.28.1 (latest version)
