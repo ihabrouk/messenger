@@ -299,7 +299,7 @@ If you discover any security-related issues, please email security@example.com i
 
 ## Credits
 
-- [Ihab Brouk](https://github.com/ihabrouk)
+- [Ihabrouk](https://github.com/ihabrouk)
 - [All Contributors](../../contributors)
 
 ## License
